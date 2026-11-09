@@ -4,4 +4,9 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Build debug memakai network security config khusus yang mengizinkan
+         HTTP (cleartext) hanya untuk host backend LAN. Build release tidak
+         memakai config ini sehingga tetap mewajibkan HTTPS. -->
+    <application android:networkSecurityConfig="@xml/network_security_config"/>
 </manifest>

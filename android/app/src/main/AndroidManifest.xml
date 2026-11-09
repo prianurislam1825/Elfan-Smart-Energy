@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Aplikasi memanggil backend ELFAN melalui HTTP/HTTPS. Permission ini
+         dibutuhkan di semua build type; tanpa ini release build tidak dapat
+         mengakses jaringan sama sekali. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="elfan_mobile"
         android:name="${applicationName}"

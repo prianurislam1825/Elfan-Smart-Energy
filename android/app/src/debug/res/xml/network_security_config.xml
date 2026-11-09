@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network security config untuk build DEBUG saja (tidak ikut ke release).
+
+  Latar belakang: sejak Android 9 (API 28) HTTP tanpa TLS (cleartext) diblokir
+  secara default. Backend ELFAN di Raspberry Pi untuk pengembangan LAN masih
+  berjalan di http://192.168.20.137:8000, sehingga cleartext perlu diizinkan.
+
+  Cakupan sengaja dibuat sempit dan aman:
+  - cleartext HANYA diizinkan untuk host backend LAN di bawah ini,
+  - semua host lain tetap wajib HTTPS dengan validasi TLS normal
+    (trust anchor sistem, tanpa menonaktifkan verifikasi sertifikat),
+  - file ini hanya berada di source set `debug`, jadi build release/profile
+    tidak memuat pengecualian ini.
+
+  Jika alamat backend LAN berubah, ubah nilai domain di sini. Base URL aplikasi
+  sendiri tetap diatur lewat dart-define ELFAN_API_BASE_URL, bukan hardcode.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">192.168.20.137</domain>
+    </domain-config>
+</network-security-config>
