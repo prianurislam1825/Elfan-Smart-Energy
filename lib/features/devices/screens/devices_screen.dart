@@ -249,6 +249,24 @@ class _MonitoringSummaryCard extends StatelessWidget {
                   ),
               ],
             ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: <Widget>[
+                InfoChip(
+                  label: 'Interval ${_formatInterval(status.intervalSeconds)}',
+                  icon: Icons.timer_outlined,
+                  tone: ChipTone.primary,
+                ),
+                if (status.lastRunAt != null)
+                  InfoChip(
+                    label: 'Terakhir ${_formatDateTime(status.lastRunAt!)}',
+                    icon: Icons.access_time,
+                    tone: ChipTone.neutral,
+                  ),
+              ],
+            ),
             const SizedBox(height: 12),
             Row(
               children: <Widget>[
@@ -348,6 +366,18 @@ class _MonitoringSummaryCard extends StatelessWidget {
 
   String _formatDateTime(DateTime dt) {
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+  }
+
+  String _formatInterval(int seconds) {
+    if (seconds <= 0) {
+      return 'tidak diketahui';
+    }
+    if (seconds < 60) {
+      return '$seconds detik';
+    }
+    final int minutes = seconds ~/ 60;
+    final int rest = seconds % 60;
+    return rest == 0 ? '$minutes menit' : '$minutes menit $rest detik';
   }
 }
 
@@ -838,15 +868,28 @@ class _DeviceTile extends ConsumerWidget {
                 runSpacing: 8,
                 children: device.channels!.asMap().entries.map((entry) {
                   final channel = entry.value;
-                  return Chip(
-                    avatar: Icon(
-                      Icons.circle,
-                      color: channel.isOn
-                          ? ColorTokens.success
-                          : ColorTokens.textSecondary,
-                      size: 8,
+                  return Tooltip(
+                    message: channel.isOn
+                        ? 'Kondisi terakhir: ON'
+                        : channel.isOff
+                        ? 'Kondisi terakhir: OFF'
+                        : 'Kondisi belum tersedia dari backend',
+                    child: Chip(
+                      avatar: Icon(
+                        channel.isOn
+                            ? Icons.circle
+                            : channel.isOff
+                            ? Icons.circle_outlined
+                            : Icons.help_outline_rounded,
+                        color: channel.isOn
+                            ? ColorTokens.success
+                            : channel.isOff
+                            ? ColorTokens.textSecondary
+                            : ColorTokens.warning,
+                        size: 12,
+                      ),
+                      label: Text('Kanal ${entry.key + 1}: ${channel.name}'),
                     ),
-                    label: Text('Kanal ${entry.key + 1}: ${channel.name}'),
                   );
                 }).toList(),
               ),

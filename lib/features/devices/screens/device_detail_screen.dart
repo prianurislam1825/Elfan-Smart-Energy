@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/color_tokens.dart';
+import '../../../core/utils/date_format.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/device_model.dart';
+import '../../../data/models/device_state_model.dart';
 import '../../../data/models/monitoring_model.dart';
 import '../../../data/providers/device_providers.dart';
 import '../../../data/providers/device_control_provider.dart';
@@ -72,6 +74,7 @@ class DeviceDetailScreen extends ConsumerWidget {
               ref
                   .read(deviceDetailProvider(deviceId).notifier)
                   .refresh(deviceId);
+              ref.read(deviceStateProvider(deviceId).notifier).refresh();
             },
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Muat Ulang',
@@ -114,7 +117,7 @@ class DeviceDetailScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 20),
-              _DeviceMonitoringSection(logicalId: device.id),
+              _DeviceStateSection(logicalId: device.id),
               const SizedBox(height: 20),
               if (device.isMultiChannel && device.channels != null) ...<Widget>[
                 _InfoSection(
@@ -131,7 +134,7 @@ class DeviceDetailScreen extends ConsumerWidget {
                                 ? ColorTokens.successSoft
                                 : ColorTokens.background,
                             child: Icon(
-                              channel.isOn ? Icons.check_circle : Icons.circle,
+                              _channelIcon(channel),
                               color: channel.isOn
                                   ? ColorTokens.success
                                   : ColorTokens.textSecondary,
@@ -140,16 +143,21 @@ class DeviceDetailScreen extends ConsumerWidget {
                           ),
                           title: Text('Kanal $channelNum: ${channel.name}'),
                           subtitle: Text(
-                            'DP: ${channel.switchDp} | Status: ${channel.state?.toUpperCase() ?? "--"}',
+                            'Kondisi: ${_channelStateLabel(channel)}',
                           ),
                           trailing: channel.isOn
                               ? const Icon(
                                   Icons.toggle_on,
                                   color: ColorTokens.success,
                                 )
-                              : const Icon(
+                              : channel.isOff
+                              ? const Icon(
                                   Icons.toggle_off,
                                   color: ColorTokens.textSecondary,
+                                )
+                              : const Icon(
+                                  Icons.help_outline_rounded,
+                                  color: ColorTokens.warning,
                                 ),
                           onTap: () {
                             showDialog(
@@ -255,6 +263,20 @@ class DeviceDetailScreen extends ConsumerWidget {
     if (text.isEmpty) return text;
     return text[0].toUpperCase() + text.substring(1);
   }
+
+  /// Label kondisi kanal. Perangkat dari endpoint detail tidak selalu memuat
+  /// `state`, sehingga kondisi yang tidak diketahui ditulis apa adanya.
+  String _channelStateLabel(DeviceChannel channel) {
+    if (channel.isOn) return 'ON';
+    if (channel.isOff) return 'OFF';
+    return 'belum tersedia';
+  }
+
+  IconData _channelIcon(DeviceChannel channel) {
+    if (channel.isOn) return Icons.check_circle;
+    if (channel.isOff) return Icons.circle;
+    return Icons.help_outline_rounded;
+  }
 }
 
 class _InfoSection extends StatelessWidget {
@@ -324,44 +346,114 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-/// Status koneksi perangkat dan status channel dari endpoint monitoring.
-class _DeviceMonitoringSection extends ConsumerWidget {
-  const _DeviceMonitoringSection({required this.logicalId});
+/// Kondisi perangkat dan state kanal dari `GET /api/v1/devices/{id}/state`.
+///
+/// Status koneksi perangkat ditampilkan terpisah dari kondisi ON/OFF kanal.
+class _DeviceStateSection extends ConsumerWidget {
+  const _DeviceStateSection({required this.logicalId});
 
   final String logicalId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final MonitoringDeviceResult? result = ref.watch(
-      deviceMonitoringProvider(logicalId),
-    );
-    if (result == null) {
-      return const SizedBox.shrink();
+    final DeviceStateViewState view = ref.watch(deviceStateProvider(logicalId));
+    final DeviceStateSnapshot? snapshot = view.snapshot;
+
+    if (snapshot == null) {
+      return _InfoSection(
+        title: 'Kondisi perangkat',
+        children: <Widget>[
+          if (view.isLoading)
+            const Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 8),
+                Text('Memuat kondisi perangkat...'),
+              ],
+            )
+          else ...<Widget>[
+            Text(
+              view.error == null
+                  ? 'Kondisi perangkat belum tersedia dari backend.'
+                  : _message(view.error),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () =>
+                  ref.read(deviceStateProvider(logicalId).notifier).refresh(),
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Muat Kondisi'),
+            ),
+          ],
+        ],
+      );
     }
-    final Color connectionColor = switch (result.connectionStatus) {
+
+    final Color connectionColor = switch (snapshot.connectionStatus) {
       ConnectionStatus.online => ColorTokens.success,
       ConnectionStatus.offline => ColorTokens.danger,
       ConnectionStatus.unknown => ColorTokens.warning,
     };
 
     return _InfoSection(
-      title: 'Monitoring',
+      title: 'Kondisi perangkat',
       children: <Widget>[
         _InfoRow(
           label: 'Status koneksi',
-          value: result.connectionStatus.displayName.toUpperCase(),
+          value: snapshot.connectionStatus.displayName.toUpperCase(),
           valueColor: connectionColor,
         ),
-        for (final MonitoringChannelResult channel in result.channels)
+        if (snapshot.lastUpdatedAt != null)
+          _InfoRow(
+            label: 'Diperbarui',
+            value: formatDateTime(snapshot.lastUpdatedAt!),
+          ),
+        if (snapshot.lastSeenAt != null)
+          _InfoRow(
+            label: 'Terakhir terlihat',
+            value: formatDateTime(snapshot.lastSeenAt!),
+          ),
+        if (snapshot.source != null)
+          _InfoRow(label: 'Sumber data', value: snapshot.source!),
+        if (snapshot.error != null)
+          _InfoRow(
+            label: 'Catatan backend',
+            value: snapshot.error!,
+            valueColor: ColorTokens.warning,
+          ),
+        for (final MonitoringChannelResult channel in snapshot.channels)
           _InfoRow(
             label: channel.name,
-            value: channel.state.displayName,
+            value: channel.state.displayName == '--'
+                ? 'belum tersedia'
+                : channel.state.displayName,
             valueColor: channel.state.isOn
                 ? ColorTokens.success
                 : ColorTokens.textSecondary,
           ),
+        if (view.isLoading) ...<Widget>[
+          const SizedBox(height: 4),
+          const LinearProgressIndicator(minHeight: 2),
+        ],
+        if (view.error != null && !view.isLoading) ...<Widget>[
+          const SizedBox(height: 8),
+          Text(
+            'Pembaruan kondisi gagal: ${_message(view.error)}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
       ],
     );
+  }
+
+  String _message(Object? error) {
+    if (error is ApiException) return error.userMessage;
+    if (error is String) return error;
+    return 'Gagal memuat kondisi perangkat.';
   }
 }
 

@@ -50,7 +50,8 @@ class MonitoringStatus {
         return null;
       }
       try {
-        return DateTime.parse(text);
+        // Backend mengirim timestamp UTC (akhiran Z); tampilkan waktu lokal.
+        return DateTime.parse(text).toLocal();
       } catch (_) {
         return null;
       }
@@ -133,7 +134,8 @@ class MonitoringResult {
         return null;
       }
       try {
-        return DateTime.parse(text);
+        // Backend mengirim timestamp UTC (akhiran Z); tampilkan waktu lokal.
+        return DateTime.parse(text).toLocal();
       } catch (_) {
         return null;
       }

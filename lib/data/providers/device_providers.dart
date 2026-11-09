@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart' show immutable;
 
 import '../models/device_model.dart';
+import '../models/device_state_model.dart';
 import '../models/monitoring_model.dart';
 import '../repositories/device_repository.dart';
 import 'api_client_provider.dart';
@@ -304,4 +305,72 @@ class MonitoringNotifier extends Notifier<MonitoringState> {
 final monitoringProvider =
     NotifierProvider<MonitoringNotifier, MonitoringState>(
       MonitoringNotifier.new,
+    );
+
+/// State: kondisi perangkat dari `GET /api/v1/devices/{logical_id}/state`.
+@immutable
+class DeviceStateViewState {
+  const DeviceStateViewState({
+    this.snapshot,
+    this.isLoading = false,
+    this.error,
+    this.lastRefreshed,
+  });
+
+  final DeviceStateSnapshot? snapshot;
+  final bool isLoading;
+  final Object? error;
+  final DateTime? lastRefreshed;
+}
+
+/// Notifier kondisi perangkat (satu instance per `logical_id`).
+class DeviceStateNotifier extends Notifier<DeviceStateViewState> {
+  DeviceStateNotifier(this.logicalId);
+
+  /// `logical_id` perangkat yang ditangani provider keluarga ini.
+  final String logicalId;
+
+  @override
+  DeviceStateViewState build() {
+    Future<void>.microtask(refresh);
+    return const DeviceStateViewState();
+  }
+
+  /// Ambil kondisi terbaru dari backend.
+  Future<void> refresh() async {
+    if (state.isLoading) return;
+
+    state = DeviceStateViewState(
+      snapshot: state.snapshot,
+      isLoading: true,
+      lastRefreshed: state.lastRefreshed,
+    );
+
+    try {
+      final DeviceStateSnapshot? snapshot = await ref
+          .read(deviceRepositoryProvider)
+          .getDeviceState(logicalId);
+      state = DeviceStateViewState(
+        snapshot: snapshot,
+        isLoading: false,
+        error: snapshot == null
+            ? 'Format respons kondisi perangkat tidak dikenali.'
+            : null,
+        lastRefreshed: DateTime.now(),
+      );
+    } catch (error) {
+      state = DeviceStateViewState(
+        snapshot: state.snapshot,
+        isLoading: false,
+        error: error,
+        lastRefreshed: state.lastRefreshed,
+      );
+    }
+  }
+}
+
+/// Provider kondisi perangkat.
+final deviceStateProvider =
+    NotifierProvider.family<DeviceStateNotifier, DeviceStateViewState, String>(
+      DeviceStateNotifier.new,
     );

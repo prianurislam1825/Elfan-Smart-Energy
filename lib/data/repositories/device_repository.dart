@@ -1,5 +1,6 @@
 import '../../core/constants/api_endpoints.dart';
 import '../models/device_model.dart';
+import '../models/device_state_model.dart';
 import '../models/monitoring_model.dart';
 import '../services/api_client.dart';
 import '../services/api_exception.dart';
@@ -43,11 +44,15 @@ class DeviceRepository {
     return Device.tryParse(data);
   }
 
-  /// Ambil kondisi perangkat tertentu.
-  Future<Map<String, dynamic>> getDeviceState(String logicalId) {
-    return apiClient.get<Map<String, dynamic>>(
+  /// Ambil kondisi perangkat tertentu, termasuk state kanal terbaru.
+  ///
+  /// Respons `null` berarti format respons tidak dikenali; pemanggil dapat
+  /// menampilkannya sebagai data belum tersedia, bukan kondisi OFF.
+  Future<DeviceStateSnapshot?> getDeviceState(String logicalId) async {
+    final Map<String, dynamic> data = await apiClient.get<Map<String, dynamic>>(
       ApiEndpoints.deviceStatePath(logicalId),
     );
+    return DeviceStateSnapshot.tryParse(data);
   }
 
   /// Kirim perintah ke perangkat.

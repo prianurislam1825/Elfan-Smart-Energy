@@ -14,6 +14,22 @@ FastAPI di Raspberry Pi; LAN base URL `http://192.168.20.137:8000`; Swagger `htt
 
 Jangan mengarang endpoint auth, location, voice, CCTV, energy, productivity, history.
 
+## Endpoint yang dipakai ELFAN Mobile V2
+
+Hanya endpoint di bawah ini yang benar-benar dipanggil aplikasi saat ini. Semua
+melewati `ApiClient` (Dio) dengan base URL dari `--dart-define=ELFAN_API_BASE_URL`.
+
+| Method | Path | Dipakai untuk |
+|---|---|---|
+| GET | `/health` | Pemeriksaan koneksi backend di Home |
+| GET | `/api/v1/devices` | Daftar perangkat |
+| GET | `/api/v1/devices/{logical_id}` | Detail perangkat |
+| GET | `/api/v1/devices/{logical_id}/state` | Kondisi perangkat di halaman detail: `connection_status`, `channels[].state`, `last_updated_at`, `source` |
+| GET | `/api/v1/devices/{logical_id}/status` | Tersedia di repository; belum dipakai UI (schema mirip `/state` + `success`) |
+| POST | `/api/v1/devices/{logical_id}/commands` | Kontrol kanal; payload hanya `switch_dp` dari channel backend (NEEDS CONFIRMATION untuk action/`turn_on` eksplisit) |
+| GET | `/api/v1/monitoring/status` | Status monitoring agregat |
+| POST | `/api/v1/monitoring/check` | Pemeriksaan monitoring manual |
+
 ## Audit checklist
 Catat method/path, auth, permission/tenant scope, parameters, request, response, error codes, pagination, timeout, idempotency, status, dan file backend sumber.
 
