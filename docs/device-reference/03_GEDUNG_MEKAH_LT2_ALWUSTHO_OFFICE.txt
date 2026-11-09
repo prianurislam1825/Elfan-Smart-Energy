@@ -1,0 +1,767 @@
+ELFAN V2 — REFERENSI PERANGKAT & LOKASI
+Dokumen: Gedung Mekah, Lantai 2 — Alwustho Office
+Sumber: Alwustho Office Lt 2 gedung mekah(2).txt
+Status: Referensi yang diberikan pengguna; isi teknis dipertahankan.
+Aturan: Nilai snapshot bukan status real-time. Bagian yang ditandai belum diuji tidak boleh dianggap sebagai kontrak API terverifikasi.
+==============================================================================
+
+# Dokumentasi Perangkat ELFAN Smart Building
+
+## Gedung Makkah – Lantai 2
+
+### Alwustho Office
+
+## 1. Smart Plug AC Alwustho Office
+
+
+
+Online
+
+Tuya Smart Plug
+
+
+
+### A. Identitas Perangkat
+
+| Informasi        | Detail                                      |
+| ---------------- | ------------------------------------------- |
+| Nama perangkat   | Smart Plug                                  |
+| Lokasi           | Gedung Makkah, Lantai 2 – Alwustho Office   |
+| Fungsi           | Memutus dan menyambungkan aliran listrik AC |
+| Product Name     | Smart plug                                  |
+| Device ID        | `a3fc5edf44f5ebf6d5kwct`                    |
+| Product Category | `cz`                                        |
+| Device Status    | Online                                      |
+| Activated At     | 15 Oktober 2026, 15:11:18                   |
+| Project          | ELFAN-Smart-Building                        |
+| Association      | `gg-104877865119244591275`                  |
+| Data Center      | Singapore Data Center                       |
+| Sub-Device       | No                                          |
+| IP Address       | `157.85.211.151`                            |
+
+### B. Fungsi dan Mekanisme
+
+Smart Plug digunakan sebagai pemutus dan penyambung aliran listrik AC yang dikendalikan melalui perangkat IR.
+
+Keduanya mengontrol satu unit AC yang sama, tetapi memiliki fungsi berbeda:
+
+1. IR AC: Mengontrol fungsi AC seperti Power, suhu, mode, dan kecepatan kipas.
+2. Smart Plug: Memutus atau menyambungkan sumber listrik AC secara langsung.
+
+Dengan mekanisme tersebut, ketika Smart Plug dimatikan, AC akan kehilangan suplai listrik sehingga tidak dapat dioperasikan melalui remote maupun IR.
+
+Catatan implementasi: Smart Plug dan IR harus diperlakukan sebagai dua perangkat berbeda dalam sistem, tetapi dikelompokkan dalam satu perangkat fisik AC pada aplikasi ELFAN.
+
+### C. Fitur Perangkat
+
+Berdasarkan data Standard Instruction Set dan Standard Status Set, perangkat memiliki fitur berikut:
+
+| Fitur                 | Data Point          | Tipe    | Keterangan                                            |
+| --------------------- | ------------------- | ------- | ----------------------------------------------------- |
+| Power                 | `switch_1`          | Boolean | Menghidupkan atau mematikan aliran listrik            |
+| Countdown             | `countdown_1`       | Integer | Timer hitung mundur dalam detik                       |
+| Relay Status          | `relay_status`      | Enum    | Pengaturan kondisi relay                              |
+| Light Mode            | `light_mode`        | Enum    | Pengaturan mode indikator                             |
+| Child Lock            | `child_lock`        | Boolean | Mengaktifkan atau menonaktifkan kunci perangkat       |
+| Cycle Time            | `cycle_time`        | String  | Pengaturan waktu siklus                               |
+| Random Time           | `random_time`       | String  | Pengaturan waktu acak                                 |
+| Inching               | `switch_inching`    | String  | Pengaturan pemutusan otomatis setelah durasi tertentu |
+| Overcharge Protection | `overcharge_switch` | Boolean | Pengaturan proteksi daya berlebih                     |
+
+### D. Detail Data Point
+
+1\. Power – `switch_1`
+
+- Tipe: Boolean
+- Nilai: `true` / `false`
+- `true`: Smart Plug aktif, aliran listrik tersambung.
+- `false`: Smart Plug nonaktif, aliran listrik terputus.
+
+2\. Countdown – `countdown_1`
+
+- Tipe: Integer
+- Satuan: Detik
+- Minimum: 0
+- Maksimum: 86.400 detik
+- Step: 1 detik
+
+Digunakan untuk mengatur durasi sebelum Smart Plug menjalankan perubahan kondisi sesuai mekanisme countdown perangkat.
+
+3\. Relay Status – `relay_status`
+
+- Tipe: Enum
+- Pilihan:
+  - `power_off`
+  - `power_on`
+  - `last`
+
+4\. Light Mode – `light_mode`
+
+- Tipe: Enum
+- Pilihan:
+  - `relay`
+  - `pos`
+  - `none`
+
+5\. Child Lock – `child_lock`
+
+- Tipe: Boolean
+- Nilai: `true` / `false`
+
+6\. Cycle Time – `cycle_time`
+
+- Tipe: String
+- Digunakan untuk konfigurasi pengaturan waktu siklus.
+
+7\. Random Time – `random_time`
+
+- Tipe: String
+- Digunakan untuk konfigurasi pengaturan waktu acak.
+
+8\. Inching – `switch_inching`
+
+- Tipe: String
+- Digunakan untuk mengatur pemutusan otomatis setelah durasi tertentu.
+
+9\. Overcharge Protection – `overcharge_switch`
+
+- Tipe: Boolean
+- Nilai: `true` / `false`
+
+### E. Monitoring Konsumsi Listrik
+
+Smart Plug menyediakan data monitoring kelistrikan melalui Standard Status Set.
+
+| Data Point    | Tipe    | Satuan | Keterangan                          |
+| ------------- | ------- | ------ | ----------------------------------- |
+| `cur_voltage` | Integer | V      | Tegangan listrik saat ini           |
+| `cur_power`   | Integer | W      | Daya listrik saat ini               |
+| `cur_current` | Integer | mA     | Arus listrik saat ini               |
+| `add_ele`     | Integer | kWh    | Total energi listrik yang digunakan |
+
+Rentang data berdasarkan spesifikasi perangkat:
+
+| Data    | Minimum | Maksimum   | Scale |
+| ------- | ------- | ---------- | ----- |
+| Voltage | 0       | 5.000 V    | 1     |
+| Power   | 0       | 200.000 W  | 1     |
+| Current | 0       | 80.000 mA  | 0     |
+| Energy  | 0       | 50.000 kWh | 3     |
+
+Data tersebut dapat digunakan ELFAN untuk menampilkan informasi konsumsi listrik AC.
+
+### F. Kebutuhan Implementasi pada Aplikasi ELFAN
+
+Smart Plug tidak perlu ditampilkan sebagai perangkat AC terpisah. Perangkat ini menjadi bagian dari kontrol AC Alwustho Office.
+
+Rancangan fungsi pada aplikasi:
+
+| Kontrol                | Fungsi                                       |
+| ---------------------- | -------------------------------------------- |
+| Power AC melalui IR    | Mengontrol operasional AC                    |
+| Power Supply AC        | Menghidupkan atau memutus Smart Plug         |
+| Timer                  | Mengatur countdown Smart Plug                |
+| Electricity Monitoring | Menampilkan tegangan, arus, daya, dan energi |
+| Child Lock             | Mengunci kontrol Smart Plug                  |
+
+Mekanisme kontrol yang perlu diperhatikan:
+
+- Ketika Smart Plug OFF, perintah IR tidak dapat mengoperasikan AC karena suplai listrik terputus.
+- Ketika Smart Plug ON, AC mendapatkan suplai listrik dan dapat dikendalikan melalui IR.
+- Status Smart Plug dan status AC dari IR harus disimpan sebagai dua status berbeda. Keduanya tidak boleh dianggap selalu identik.
+
+### G. Catatan untuk Pengembangan Backend
+
+| Komponen      | Identifikasi                                         |
+| ------------- | ---------------------------------------------------- |
+| Integrasi     | Tuya Cloud                                           |
+| Kategori      | `cz`                                                 |
+| Device ID     | `a3fc5edf44f5ebf6d5kwct`                             |
+| Kontrol utama | `switch_1`                                           |
+| Timer         | `countdown_1`                                        |
+| Monitoring    | `cur_voltage`, `cur_power`, `cur_current`, `add_ele` |
+
+Status awal yang tercatat pada konfigurasi perangkat:
+
+```
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "child_lock",
+    "value": false
+  },
+  {
+    "code": "overcharge_switch",
+    "value": false
+  }
+]
+```
+
+Nilai di atas merupakan status yang tercatat saat dokumentasi dibuat, bukan nilai permanen perangkat.
+
+Status dokumentasi: Smart Plug AC Alwustho Office selesai didokumentasikan.
+
+Perangkat berikutnya adalah IR AC dan kipas Alwustho Office. Keduanya berada pada satu IR yang sama, sehingga dokumentasi berikutnya perlu mencatat pemetaan perangkat IR beserta fungsi masing-masing.
+
+
+# Dokumentasi Perangkat ELFAN Smart Building
+
+## Gedung Makkah – Lantai 2
+
+### Alwustho Office
+
+## 2. IR Remote Alwustho Office
+
+
+
+Online
+
+Universal IR Remote
+
+
+
+### A. Identitas Perangkat
+
+| Informasi        | Detail                                                |
+| ---------------- | ----------------------------------------------------- |
+| Nama perangkat   | IR Alwustho Office                                    |
+| Lokasi           | Gedung Makkah, Lantai 2 – Alwustho Office             |
+| Fungsi           | Mengendalikan perangkat elektronik melalui inframerah |
+| Product Name     | IR REMOTE                                             |
+| Device ID        | `41887722e09806b37aa7`                                |
+| Product Category | `wnykq`                                               |
+| Device Status    | Online                                                |
+| Activated At     | 12 Oktober 2026, 14:28:24                             |
+| Project          | ELFAN-Smart-Building                                  |
+| Association      | `gg-104877865119244591275`                            |
+| Data Center      | Singapore Data Center                                 |
+| Sub-Device       | No                                                    |
+| IP Address       | `157.85.212.208`                                      |
+
+### B. Fungsi Perangkat
+
+IR Remote merupakan perangkat utama untuk mengirimkan perintah inframerah ke perangkat elektronik di Alwustho Office.
+
+Satu perangkat IR digunakan untuk mengendalikan dua perangkat:
+
+1. AC Alwustho Office
+2. Kipas Alwustho Office
+
+Perangkat AC dan kipas ditambahkan sebagai perangkat turunan (sub-device) melalui proses konfigurasi pada aplikasi Smart Life.
+
+Dengan demikian, IR Remote berfungsi sebagai pusat pengiriman perintah inframerah, sedangkan AC dan kipas memiliki konfigurasi serta perintah masing-masing.
+
+### C. Struktur Perangkat
+
+| Perangkat             | Jenis Kontrol       | Fungsi                                     |
+| --------------------- | ------------------- | ------------------------------------------ |
+| IR Alwustho Office    | Universal IR Remote | Perangkat utama pengirim sinyal inframerah |
+| AC Alwustho Office    | IR Sub-Device       | Mengontrol fungsi AC                       |
+| Kipas Alwustho Office | IR Sub-Device       | Mengontrol fungsi kipas                    |
+
+Catatan: Smart Plug AC Alwustho Office merupakan perangkat terpisah dan tidak termasuk sub-device IR.
+
+### D. Data Perangkat pada Tuya
+
+Berdasarkan JSON Editor yang diberikan, data perangkat IR memiliki struktur berikut:
+
+```
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "light_mode"
+  },
+  {
+    "code": "child_lock",
+    "value": false
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "switch_inching"
+  },
+  {
+    "code": "overcharge_switch",
+    "value": false
+  }
+]
+```
+
+Catatan: JSON Editor tersebut menunjukkan data fungsi perangkat yang tersedia. Data ini belum membuktikan bahwa seluruh fungsi tersebut merupakan perintah pengiriman sinyal IR untuk AC atau kipas.
+
+### E. Mekanisme Integrasi ELFAN
+
+Implementasi pada backend perlu membedakan dua jenis komunikasi:
+
+- IR Remote: Mengirim perintah ke perangkat elektronik melalui konfigurasi sub-device.
+- Smart Plug: Mengontrol suplai listrik AC secara langsung melalui Tuya Cloud.
+
+Alur pengendalian:
+
+1. ELFAN menerima perintah pengguna.
+2. Backend mengidentifikasi perangkat tujuan, yaitu AC atau kipas.
+3. Backend mengambil konfigurasi perintah dari sub-device yang sesuai.
+4. IR Remote mengirimkan sinyal inframerah ke perangkat tujuan.
+5. Untuk pemutusan listrik AC, ELFAN menggunakan Smart Plug, bukan perintah Power Off dari IR.
+
+### F. Kebutuhan Implementasi
+
+| Komponen               | Kebutuhan                                |
+| ---------------------- | ---------------------------------------- |
+| Identifikasi IR        | Menggunakan Device ID IR Alwustho Office |
+| Registrasi sub-device  | AC dan kipas                             |
+| Kontrol AC             | Menggunakan perintah IR AC               |
+| Kontrol kipas          | Menggunakan perintah IR kipas            |
+| Pemutusan listrik AC   | Menggunakan Smart Plug AC                |
+| Pengelompokan aplikasi | Satu lokasi Alwustho Office              |
+
+Catatan pengembangan: Device ID IR utama tidak boleh tertukar dengan Device ID sub-device AC dan kipas. Backend perlu menyimpan relasi antara IR utama dan masing-masing sub-device agar perintah tidak salah sasaran.
+
+Dokumentasi IR selesai
+
+Berikutnya kita dokumentasikan sub-device AC Alwustho Office, kemudian sub-device kipas Alwustho Office.
+
+
+# DOKUMENTASI PERANGKAT ELFAN SMART BUILDING
+
+## Gedung Makkah – Lantai 2
+
+### Alwustho Office – Kipas Angin
+
+
+
+Online
+
+IR Sub-Device
+
+
+
+## 1. Identitas dan Lokasi
+
+Perangkat kipas Alwustho Office dikendalikan melalui Universal IR Remote yang berada di lokasi yang sama.
+
+Kipas menggunakan dua sub-device IR dengan fungsi berbeda. Keduanya digabung menjadi satu perangkat pada aplikasi ELFAN.
+
+### 1.1 Informasi Lokasi
+
+| Informasi               | Detail                     |
+| ----------------------- | -------------------------- |
+| Gedung                  | Gedung Makkah              |
+| Lantai                  | 2                          |
+| Ruangan                 | Alwustho Office            |
+| Nama perangkat aplikasi | Kipas Alwustho Office      |
+| Perangkat utama         | IR Alwustho Office         |
+| Jenis komunikasi        | Infrared (IR)              |
+| Project                 | ELFAN-Smart-Building       |
+| Association             | `gg-104877865119244591275` |
+| Data Center             | Singapore Data Center      |
+
+## 2. Arsitektur Perangkat
+
+Kipas memiliki dua sub-device yang terdaftar pada Tuya Developer.
+
+| Komponen                  | Fungsi                                              |
+| ------------------------- | --------------------------------------------------- |
+| IR Remote Alwustho Office | Perangkat utama pengirim sinyal IR                  |
+| Sub-device 1              | Menghidupkan kipas serta mengontrol Speed dan Swing |
+| Sub-device 2              | Mengirim perintah khusus untuk mematikan kipas      |
+
+Kedua sub-device harus tetap disimpan sebagai perangkat berbeda pada backend, tetapi ditampilkan sebagai satu perangkat kipas pada aplikasi ELFAN.
+
+## 3. Sub-Device 1 – Power On, Speed, dan Swing
+
+Online
+
+### 3.1 Identitas Perangkat
+
+| Informasi        | Detail                     |
+| ---------------- | -------------------------- |
+| Product Name     | 红外风扇                       |
+| Device ID        | `a3c52ec7379a7d337cvgjl`   |
+| Product Category | `qt`                       |
+| Device Status    | Online                     |
+| Activated At     | 3 November 2026, 14:30:06  |
+| Project          | ELFAN-Smart-Building       |
+| Association      | `gg-104877865119244591275` |
+| Data Center      | Singapore Data Center      |
+| Sub-Device       | Yes                        |
+| IP Address       | Tidak tersedia             |
+
+### 3.2 Fungsi Perangkat
+
+Sub-device pertama digunakan untuk menjalankan fungsi utama kipas, yaitu:
+
+1. Menghidupkan kipas.
+2. Mengatur kecepatan kipas.
+3. Mengatur gerakan Swing.
+
+Perintah PowerOn, Speed, dan Swing merupakan perintah terpisah, tetapi dikelompokkan dalam satu alur kontrol Hidupkan pada aplikasi ELFAN.
+
+### 3.3 JSON Editor
+
+```
+[
+  {
+    "code": "NegativeIon"
+  },
+  {
+    "code": "PowerOff"
+  },
+  {
+    "code": "PowerOn"
+  },
+  {
+    "code": "Speed"
+  },
+  {
+    "code": "Swing"
+  },
+  {
+    "code": "Timing"
+  }
+]
+```
+
+### 3.4 Standard Instruction Set
+
+| Code          | Type   | Values          |
+| ------------- | ------ | --------------- |
+| `NegativeIon` | STRING | `"NegativeIon"` |
+| `PowerOff`    | STRING | `"PowerOff"`    |
+| `PowerOn`     | STRING | `"PowerOn"`     |
+| `Speed`       | STRING | `"Speed"`       |
+| `Swing`       | STRING | `"Swing"`       |
+| `Timing`      | STRING | `"Timing"`      |
+
+### 3.5 Pemetaan Fungsi
+
+| Perintah      | Fungsi                     | Implementasi ELFAN                                        |
+| ------------- | -------------------------- | --------------------------------------------------------- |
+| `PowerOn`     | Menghidupkan kipas         | Tombol Hidupkan                                           |
+| `Speed`       | Mengatur kecepatan kipas   | Kontrol Speed                                             |
+| `Swing`       | Mengatur gerakan kipas     | Kontrol Swing                                             |
+| `PowerOff`    | Mematikan kipas            | Tidak digunakan pada alur utama; menggunakan Sub-device 2 |
+| `NegativeIon` | Perintah fitur ion negatif | Belum digunakan                                           |
+| `Timing`      | Perintah pengaturan timer  | Belum digunakan                                           |
+
+## 4. Sub-Device 2 – Power Off
+
+Online
+
+### 4.1 Identitas Perangkat
+
+| Informasi        | Detail                     |
+| ---------------- | -------------------------- |
+| Product Name     | 红外风扇                       |
+| Device ID        | `a305903aad76e1a8c8msy8`   |
+| Product Category | `qt`                       |
+| Device Status    | Online                     |
+| Activated At     | 3 November 2026, 14:30:44  |
+| Project          | ELFAN-Smart-Building       |
+| Association      | `gg-104877865119244591275` |
+| Data Center      | Singapore Data Center      |
+| Sub-Device       | Yes                        |
+| IP Address       | Tidak tersedia             |
+
+### 4.2 Fungsi Perangkat
+
+Sub-device kedua dikhususkan untuk mengirimkan perintah mematikan kipas.
+
+Walaupun Standard Instruction Set memiliki daftar perintah yang sama dengan Sub-device 1, implementasi ELFAN membatasi penggunaan sub-device ini hanya untuk fungsi Power Off.
+
+### 4.3 JSON Editor
+
+```
+[
+  {
+    "code": "NegativeIon"
+  },
+  {
+    "code": "PowerOff"
+  },
+  {
+    "code": "PowerOn"
+  },
+  {
+    "code": "Speed"
+  },
+  {
+    "code": "Swing"
+  },
+  {
+    "code": "Timing"
+  }
+]
+```
+
+### 4.4 Standard Instruction Set
+
+| Code          | Type   | Values          |
+| ------------- | ------ | --------------- |
+| `NegativeIon` | STRING | `"NegativeIon"` |
+| `PowerOff`    | STRING | `"PowerOff"`    |
+| `PowerOn`     | STRING | `"PowerOn"`     |
+| `Speed`       | STRING | `"Speed"`       |
+| `Swing`       | STRING | `"Swing"`       |
+| `Timing`      | STRING | `"Timing"`      |
+
+### 4.5 Pemetaan Fungsi
+
+| Perintah      | Fungsi             | Implementasi ELFAN |
+| ------------- | ------------------ | ------------------ |
+| `PowerOff`    | Mematikan kipas    | Tombol Matikan     |
+| `PowerOn`     | Menghidupkan kipas | Tidak digunakan    |
+| `Speed`       | Mengatur kecepatan | Tidak digunakan    |
+| `Swing`       | Mengatur Swing     | Tidak digunakan    |
+| `NegativeIon` | Fitur ion negatif  | Tidak digunakan    |
+| `Timing`      | Pengaturan timer   | Tidak digunakan    |
+
+## 5. Rancangan Tampilan Aplikasi ELFAN
+
+Kedua sub-device digabung menjadi satu perangkat dengan nama Kipas Alwustho Office.
+
+Tidak boleh ada dua kartu kipas yang berbeda pada halaman kontrol ruangan.
+
+### 5.1 Struktur Menu
+
+Kipas Alwustho Office
+
+Online
+
+Kontrol Kipas
+
+Satu perangkat dalam satu menu
+
+Hidupkan
+
+Sub-device 1
+
+Matikan
+
+Sub-device 2
+
+Pengaturan
+
+Kecepatan kipas
+
+Speed
+
+Gerakan kipas
+
+Swing
+
+### 5.2 Mekanisme Tombol Hidupkan
+
+Ketika pengguna memilih tombol Hidupkan, ELFAN menjalankan perintah berikut melalui Sub-device 1:
+
+1. `PowerOn`
+2. `Speed` sesuai pengaturan yang dipilih.
+3. `Swing` sesuai pengaturan yang dipilih.
+
+Speed dan Swing tetap memiliki kontrol masing-masing. Pengelompokan tersebut hanya berlaku untuk alur tombol Hidupkan.
+
+### 5.3 Mekanisme Tombol Matikan
+
+Ketika pengguna memilih tombol Matikan:
+
+1. ELFAN menggunakan Sub-device 2.
+2. Backend mengirimkan perintah `PowerOff`.
+3. Kipas menerima sinyal inframerah untuk berhenti beroperasi.
+
+## 6. Spesifikasi Integrasi Backend
+
+### 6.1 Data Perangkat
+
+| Parameter           | Nilai                    |
+| ------------------- | ------------------------ |
+| Nama perangkat      | Kipas Alwustho Office    |
+| Parent Device       | IR Alwustho Office       |
+| Parent Device ID    | `41887722e09806b37aa7`   |
+| Sub-device 1        | `a3c52ec7379a7d337cvgjl` |
+| Sub-device 2        | `a305903aad76e1a8c8msy8` |
+| Kategori sub-device | `qt`                     |
+| Protokol            | Infrared                 |
+| Integrasi           | Tuya Cloud               |
+
+### 6.2 Pemetaan Endpoint Perintah
+
+| Aksi ELFAN     | Target Device ID         | Code       |
+| -------------- | ------------------------ | ---------- |
+| Hidupkan       | `a3c52ec7379a7d337cvgjl` | `PowerOn`  |
+| Atur kecepatan | `a3c52ec7379a7d337cvgjl` | `Speed`    |
+| Atur Swing     | `a3c52ec7379a7d337cvgjl` | `Swing`    |
+| Matikan        | `a305903aad76e1a8c8msy8` | `PowerOff` |
+
+Catatan implementasi:
+
+- Backend harus menyimpan kedua Device ID secara terpisah.
+- Jangan mengirim perintah ke IR Remote utama jika perintah ditujukan langsung ke sub-device.
+- Format payload dan parameter nilai Speed serta Swing perlu mengikuti spesifikasi perintah Tuya yang berlaku pada sub-device.
+- Jangan mengasumsikan status kipas selalu dapat diketahui dari IR karena Standard Status Set tidak tersedia pada data yang diberikan.
+
+## 7. Catatan Pengembangan
+
+1. Kedua sub-device merupakan satu kipas fisik.
+2. Tampilan aplikasi hanya menyediakan satu menu kipas.
+3. Fungsi Hidupkan menggunakan Sub-device 1.
+4. Fungsi Speed dan Swing menggunakan Sub-device 1.
+5. Fungsi Matikan menggunakan Sub-device 2.
+6. Jangan menampilkan kedua sub-device sebagai perangkat terpisah.
+7. Status operasional kipas perlu dikelola secara hati-hati karena data Standard Status Set tidak tersedia.
+8. Fitur NegativeIon dan Timing belum masuk kebutuhan kontrol utama ELFAN.
+
+## 8. Ringkasan Konfigurasi
+
+| Komponen           | Konfigurasi          |
+| ------------------ | -------------------- |
+| Perangkat fisik    | 1 kipas              |
+| Perangkat IR utama | 1 IR Remote          |
+| Sub-device IR      | 2                    |
+| Menu aplikasi      | 1                    |
+| Tombol utama       | Hidupkan dan Matikan |
+| Kontrol tambahan   | Speed dan Swing      |
+| Perintah Hidupkan  | Sub-device 1         |
+| Perintah Matikan   | Sub-device 2         |
+| Status perangkat   | Online               |
+
+Dokumentasi selesai
+
+Status: Dokumentasi Kipas Alwustho Office selesai. Seluruh informasi identitas, pemetaan sub-device, perintah IR, dan rancangan integrasi backend sudah dicatat untuk acuan pengembangan aplikasi ELFAN.
+
+
+
+# Dokumentasi Perangkat ELFAN – Gedung Makkah
+
+## Lantai 2 – Alwustho Office
+
+### 1. AC Alwustho Office
+
+
+
+Online
+
+IR Controller
+
+
+
+Deskripsi perangkat
+
+Perangkat ini merupakan pengendali AC menggunakan Infrared (IR) yang terintegrasi dengan Smart Life dan Tuya. Tampilan serta fitur pengendaliannya sama seperti AC di Ruang Meeting Gedung Madinah.
+
+Device Information
+
+| Parameter        | Nilai                      |
+| ---------------- | -------------------------- |
+| Nama perangkat   | 红外空调                       |
+| Device ID        | `a3d65ff7735c92804cjeoc`   |
+| Product Category | `qt`                       |
+| Status           | Online                     |
+| Activated At     | 12 Oktober 2026, 14:29:48  |
+| Project          | ELFAN-Smart-Building       |
+| Association      | `gg-104877865119244591275` |
+| Data Center      | Singapore Data Center      |
+| Sub-Device       | Yes                        |
+| IP Address       | Tidak tersedia (`--`)      |
+
+### 2. Fungsi dan kontrol AC
+
+Kontrol yang tersedia berdasarkan tampilan Smart Life dan data perangkat:
+
+| Fungsi      | Keterangan                  |
+| ----------- | --------------------------- |
+| Power       | Menghidupkan AC             |
+| Power Off   | Mematikan AC                |
+| Temperature | Mengatur suhu AC, 16–30°C   |
+| Mode        | Mengatur mode operasi AC    |
+| Fan Speed   | Mengatur kecepatan kipas AC |
+
+Catatan: Rincian pilihan mode dan tingkat kecepatan belum tersedia pada data yang diberikan. Karena itu, nilai setiap pilihan belum ditetapkan.
+
+### 3. Standard Instruction Set
+
+Perintah yang tersedia untuk mengendalikan AC melalui Tuya:
+
+| Code       | Type   | Nilai      |
+| ---------- | ------ | ---------- |
+| `PowerOn`  | STRING | `PowerOn`  |
+| `PowerOff` | STRING | `PowerOff` |
+| `T`        | ENUM   | 16–30      |
+| `M`        | ENUM   | 0–4        |
+| `F`        | ENUM   | 0–3        |
+
+Keterangan:
+
+- `PowerOn`: Mengirim perintah untuk menghidupkan AC.
+- `PowerOff`: Mengirim perintah untuk mematikan AC.
+- `T`: Mengatur suhu AC.
+- `M`: Mengatur mode AC.
+- `F`: Mengatur kecepatan kipas AC.
+
+### 4. Standard Status Set
+
+Data status yang dilaporkan perangkat:
+
+| Code    | Type    | Nilai                |
+| ------- | ------- | -------------------- |
+| `power` | BOOLEAN | Status hidup/mati AC |
+| `temp`  | ENUM    | 16–30                |
+| `mode`  | ENUM    | 0–4                  |
+| `wind`  | ENUM    | 0–3                  |
+
+Keterangan:
+
+- `power`: Status daya AC.
+- `temp`: Suhu yang sedang diatur.
+- `mode`: Mode operasi AC.
+- `wind`: Kecepatan kipas AC.
+
+### 5. Integrasi dengan Smart Plug
+
+AC Alwustho Office juga menggunakan Smart Plug sebagai pemutus daya listrik utama.
+
+Mekanisme pengoperasiannya mengikuti konsep AC Ruang Meeting Gedung Madinah:
+
+1. IR Controller digunakan untuk menghidupkan, mematikan melalui perintah IR, mengatur suhu, mode, dan kecepatan kipas.
+2. Smart Plug digunakan untuk memutus atau menyambungkan suplai listrik AC secara langsung.
+3. Smart Plug dapat mematikan AC sepenuhnya sehingga AC tidak dapat dioperasikan melalui remote maupun IR ketika suplai listrik terputus.
+
+Smart Plug AC Alwustho Office sudah didokumentasikan sebelumnya dengan Device ID `a3fc5edf44f5ebf6d5kwct`.
+
+### 6. Rancangan Tampilan ELFAN Mobile
+
+AC dan Smart Plug ditampilkan sebagai satu perangkat AC dalam aplikasi, bukan sebagai dua perangkat terpisah.
+
+Menu AC Alwustho Office
+
+- Tombol Power AC.
+- Pengaturan suhu.
+- Pengaturan mode.
+- Pengaturan kecepatan kipas.
+- Kontrol suplai listrik Smart Plug.
+
+Catatan implementasi: Status AC dari IR dan status suplai listrik Smart Plug harus dikelola sebagai dua status berbeda. Ketika Smart Plug OFF, kontrol IR tidak boleh dianggap berhasil menghidupkan AC.
+
+Dokumentasi Alwustho Office
+
+Perangkat AC sudah tercatat. Berikutnya kita bisa dokumentasikan perangkat lain di Alwustho Office jika masih ada.

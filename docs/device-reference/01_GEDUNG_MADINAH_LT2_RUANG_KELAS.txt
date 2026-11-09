@@ -1,0 +1,594 @@
+ELFAN V2 — REFERENSI PERANGKAT & LOKASI
+Dokumen: Gedung Madinah, Lantai 2 — Ruang Kelas
+Sumber: Gedung Madinah Lantai 2 Ruang Kelas(2).txt
+Status: Referensi yang diberikan pengguna; isi teknis dipertahankan.
+Aturan: Nilai snapshot bukan status real-time. Bagian yang ditandai belum diuji tidak boleh dianggap sebagai kontrak API terverifikasi.
+==============================================================================
+
+## Perangkat 01:
+BARDI Smart Wall Socket - AC Kelas ELFAN (Gedung Madinah Lt2 Ruang Kelas Elfan)
+
+### 1. Informasi Dasar Perangkat
+
+| Parameter | Data |
+|---|---|
+| Nama perangkat | AC Kelas ELFAN |
+| Merek / produk | BARDI Smart Wall Socket |
+| Device ID | `a304abed0c0044168c7rbg` |
+| Product Category | `cz` |
+| Status perangkat | Online |
+| Activated At | `2026-10-08 10:50:29` |
+| Platform | Tuya Developer / Smart Life |
+| Nama proyek | ELFAN-Smart-Building |
+| Association ID | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-device | No |
+| IP Address | `157.85.211.243` |
+
+### 2. JSON Editor — Nilai DP Saat Pemeriksaan
+
+| No. | DP Code | Tipe Data | Nilai Saat Screenshot / Pemeriksaan |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true` |
+| 2 | `countdown_1` | Integer | `0` |
+| 3 | `relay_status` | Enum | `"last"` |
+| 4 | `light_mode` | Enum | `"relay"` |
+| 5 | `child_lock` | Boolean | `false` |
+| 6 | `cycle_time` | String | `""` |
+| 7 | `random_time` | String | `""` |
+| 8 | `switch_inching` | String | `""` |
+
+Catatan: nilai tersebut merupakan snapshot pada saat pemeriksaan, bukan jaminan status terkini.
+
+### 3. Standard Instruction Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 3 | `relay_status` | Enum | `power_off`, `power_on`, `last` |
+| 4 | `light_mode` | Enum | `relay`, `pos`, `none` |
+| 5 | `child_lock` | Boolean | `true`, `false` |
+| 6 | `cycle_time` | String | Spesifikasi detail belum tersedia |
+| 7 | `random_time` | String | Spesifikasi detail belum tersedia |
+| 8 | `switch_inching` | String | Spesifikasi detail belum tersedia |
+
+### 4. Standard Status Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 3 | `relay_status` | Enum | `power_off`, `power_on`, `last` |
+| 4 | `light_mode` | Enum | `relay`, `pos`, `none` |
+| 5 | `child_lock` | Boolean | `true`, `false` |
+| 6 | `cycle_time` | String | Spesifikasi detail belum tersedia |
+| 7 | `random_time` | String | Spesifikasi detail belum tersedia |
+| 8 | `switch_inching` | String | Spesifikasi detail belum tersedia |
+
+### 5. Fitur Schedule dan Timer
+
+| Fitur | Informasi | Status Dokumentasi |
+|---|---|---|
+| Schedule | Tampilan dan jenis fitur sama dengan AC Kamar Santri di Smart Life | Terkonfirmasi oleh informasi pengguna |
+| Countdown | DP `countdown_1`, rentang 0–86400 detik | Spesifikasi tersedia |
+| Circulate | Menu tersedia pada tampilan Smart Life yang sama | Detail konfigurasi belum diperiksa |
+| Random | Menu tersedia pada tampilan Smart Life yang sama | Detail konfigurasi belum diperiksa |
+| Inching | Menu tersedia pada tampilan Smart Life yang sama | Format DP belum diperiksa |
+| Astronomical | Menu tersedia pada tampilan Smart Life yang sama | Pengaturan perangkat ini belum diperiksa |
+
+Catatan: kesamaan tampilan Schedule tidak membuktikan bahwa jadwal yang tersimpan pada AC Kelas ELFAN sama dengan jadwal AC Kamar Santri.
+
+### 6. Pemetaan Fungsi untuk Backend ELFAN
+
+| Fungsi | DP / Sumber | Status |
+|---|---|---|
+| Kontrol ON/OFF | `switch_1` | DP teridentifikasi; API belum diuji |
+| Status sakelar | `switch_1` | DP teridentifikasi; pembacaan API belum diuji |
+| Countdown | `countdown_1` | Spesifikasi tersedia; pengujian belum dilakukan |
+| Konfigurasi relay | `relay_status` | Nilai tersedia; perilaku perlu diverifikasi |
+| Mode lampu indikator | `light_mode` | Nilai tersedia; perilaku perlu diverifikasi |
+| Kunci perangkat | `child_lock` | DP teridentifikasi; API belum diuji |
+| Jadwal | Smart Life Schedule | Perlu verifikasi akses dan mekanisme integrasi |
+| Monitoring listrik | Belum ditemukan pada daftar DP ini | Belum diketahui apakah tersedia |
+
+### 7. Status Kelengkapan
+
+| Bagian | Status |
+|---|---|
+| Identitas perangkat | Terdokumentasi |
+| JSON Editor | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Kesamaan tampilan Schedule dengan AC Kamar Santri | Terkonfirmasi |
+| Payload API dan pengujian perintah | Belum dilakukan |
+| Pembacaan data listrik | Belum diketahui |
+| Konfigurasi jadwal aktual | Belum diperiksa |
+
+Kesimpulan: AC Kelas ELFAN menggunakan BARDI Smart Wall Socket dengan kategori Tuya `cz`. Struktur DP yang diberikan sama dengan daftar delapan DP pada AC Kamar Santri versi Standard Instruction Set, tetapi ID perangkat dan nilai aktualnya berbeda. Integrasi backend perlu menggunakan identitas perangkat masing-masing dan tidak boleh menyamakan konfigurasi jadwal tanpa verifikasi.
+
+
+# ELFAN — Dokumentasi Perangkat
+## Perangkat 02: Lampu Kelas ELFAN
+
+### 1. Informasi Dasar Perangkat
+
+| Parameter | Data |
+|---|---|
+| Gedung | Madinah |
+| Lantai | 2 |
+| Ruangan | Kelas ELFAN |
+| Nama perangkat | Lampu Kelas ELFAN |
+| Product Name | iHome By Danhan Wall Switch 3 Gang |
+| Device ID | `a3ab53990ed6ed8424eray` |
+| Product Category | `kg` |
+| Device Status | Online |
+| Activated At | `2026-10-08 10:47:49` |
+| Platform | Tuya Developer / Smart Life |
+| Project | ELFAN-Smart-Building |
+| Association ID | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-device | No |
+| IP Address | `157.85.211.243` |
+
+### 2. Device Debugging — Nilai DP
+
+| No. | DP Code | Nilai Saat Pemeriksaan | Catatan |
+|---:|---|---|---|
+| 1 | `switch_1` | `false` | Kanal 1 OFF |
+| 2 | `switch_2` | `false` | Kanal 2 OFF |
+| 3 | `switch_3` | `false` | Kanal 3 OFF |
+| 4 | `countdown_1` | `0` | Countdown kanal 1, 0 detik |
+| 5 | `countdown_2` | `0` | Countdown kanal 2, 0 detik |
+| 6 | `countdown_3` | `0` | Countdown kanal 3, 0 detik |
+| 7 | `relay_status` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 8 | `switch_backlight` | `false` | Backlight sakelar OFF |
+| 9 | `cycle_time` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 10 | `random_time` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 11 | `switch_inching` | Tidak ditampilkan | Nilai aktual belum diketahui |
+
+Catatan: nilai DP merupakan snapshot saat pemeriksaan, bukan jaminan status terkini.
+
+### 3. Standard Instruction Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 5 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `relay_status` | Enum | `power_off`, `power_on`, `last` |
+| 8 | `switch_backlight` | Boolean | `true`, `false` |
+| 9 | `cycle_time` | String | Spesifikasi detail belum tersedia |
+| 10 | `random_time` | String | Spesifikasi detail belum tersedia |
+| 11 | `switch_inching` | String | Spesifikasi detail belum tersedia |
+
+Catatan: baris pertama pada tabel sumber tertulis `witch_1`; dokumentasi ini menggunakan `switch_1` berdasarkan JSON Editor dan Standard Status Set.
+
+### 4. Standard Status Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 5 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `relay_status` | Enum | `power_off`, `power_on`, `last` |
+| 8 | `switch_backlight` | Boolean | `true`, `false` |
+| 9 | `cycle_time` | String | Spesifikasi detail belum tersedia |
+| 10 | `random_time` | String | Spesifikasi detail belum tersedia |
+| 11 | `switch_inching` | String | Spesifikasi detail belum tersedia |
+
+### 5. Pemetaan Fungsi Backend ELFAN
+
+| Fungsi | DP Code | Status |
+|---|---|---|
+| ON/OFF kanal 1 | `switch_1` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 2 | `switch_2` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 3 | `switch_3` | Teridentifikasi; API belum diuji |
+| Countdown kanal 1 | `countdown_1` | Teridentifikasi; API belum diuji |
+| Countdown kanal 2 | `countdown_2` | Teridentifikasi; API belum diuji |
+| Countdown kanal 3 | `countdown_3` | Teridentifikasi; API belum diuji |
+| Lampu indikator sakelar | `switch_backlight` | Teridentifikasi; API belum diuji |
+| Pengaturan relay | `relay_status` | Nilai tersedia; perilaku perlu diverifikasi |
+| Schedule | Antarmuka Smart Life | Detail jadwal perangkat ini belum diberikan |
+| Circulate / Random / Inching | DP terkait | Format payload belum diverifikasi |
+
+### 6. Status Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Identitas dan lokasi | Terdokumentasi |
+| Nilai aktual tiga kanal | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Kontrol tiga kanal | DP teridentifikasi |
+| Schedule dan otomatisasi | Belum lengkap |
+| Pengujian Cloud API | Belum dilakukan |
+
+Kesimpulan: Lampu Kelas ELFAN menggunakan iHome By Danhan Wall Switch 3 Gang dengan tiga kanal sakelar independen. Backend ELFAN perlu menggunakan Device ID tersendiri dan memetakan ketiga kanal secara terpisah.
+
+
+### 5. Fitur Timer dan Otomatisasi
+
+Berdasarkan informasi pengguna, perangkat memiliki fitur timer di aplikasi Smart Life, dengan tampilan yang sama seperti perangkat sebelumnya.
+
+| Fitur | Informasi | Status |
+|---|---|---|
+| Countdown | Timer hitung mundur per kanal melalui `countdown_1`, `countdown_2`, `countdown_3` | DP tersedia |
+| Schedule | Penjadwalan ON/OFF berdasarkan waktu | Tersedia di aplikasi |
+| Circulate | Pengaturan siklus ON/OFF | Tersedia pada menu timer sebelumnya |
+| Random | Pengaturan waktu acak | Tersedia pada menu timer sebelumnya |
+| Inching | Otomatis mematikan perangkat setelah durasi tertentu | Tersedia pada menu timer sebelumnya |
+
+Catatan: keberadaan menu dan kesamaan tampilannya sudah dikonfirmasi pengguna. Konfigurasi aktual, format payload, dan dukungan pengelolaan melalui Cloud API belum diuji khusus pada perangkat ini.
+
+### 6. Pemetaan Fungsi Backend ELFAN
+
+| Fungsi | DP Code / Sumber | Status |
+|---|---|---|
+| ON/OFF kanal 1 | `switch_1` | DP teridentifikasi; API belum diuji |
+| ON/OFF kanal 2 | `switch_2` | DP teridentifikasi; API belum diuji |
+| ON/OFF kanal 3 | `switch_3` | DP teridentifikasi; API belum diuji |
+| Countdown kanal 1 | `countdown_1` | DP teridentifikasi; API belum diuji |
+| Countdown kanal 2 | `countdown_2` | DP teridentifikasi; API belum diuji |
+| Countdown kanal 3 | `countdown_3` | DP teridentifikasi; API belum diuji |
+| Lampu indikator sakelar | `switch_backlight` | DP teridentifikasi; API belum diuji |
+| Schedule | Fitur Smart Life | Tersedia di aplikasi; API belum diverifikasi |
+| Circulate / Random / Inching | Menu timer Smart Life | Tersedia pada antarmuka; payload belum diverifikasi |
+
+### 7. Status Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Identitas dan lokasi | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Nilai aktual tiga kanal | Terdokumentasi |
+| Fitur timer pada aplikasi | Terkonfirmasi |
+| Format payload timer | Belum diverifikasi |
+| Pengujian Cloud API | Belum dilakukan |
+
+Kesimpulan: Lampu Kelas ELFAN memiliki tiga kanal sakelar dan fitur timer pada aplikasi Smart Life. Implementasi backend perlu mempertahankan pemetaan per kanal, sementara integrasi schedule dan fungsi otomatisasi lainnya menunggu verifikasi API.
+
+
+# ELFAN — Dokumentasi Perangkat
+## Perangkat 03: Lampu Ruang Kelas TUK
+
+### 1. Informasi Dasar Perangkat
+
+| Parameter | Data |
+|---|---|
+| Gedung | Madinah |
+| Lantai | 2 |
+| Ruangan | Kelas TUK |
+| Nama perangkat | Lampu Ruang Kelas TUK |
+| Product Name | S604 |
+| Device ID | `a38d42d884aab2d0a6cfaf` |
+| Product Category | `kg` |
+| Device Status | Online |
+| Activated At | `2026-10-08 10:46:25` |
+| Platform | Tuya Developer / Smart Life |
+| Project | ELFAN-Smart-Building |
+| Association ID | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-device | No |
+| IP Address | `157.85.211.243` |
+
+### 2. Device Debugging — Nilai DP
+
+| No. | DP Code | Nilai Saat Pemeriksaan | Catatan |
+|---:|---|---|---|
+| 1 | `switch_1` | `false` | Kanal 1 OFF |
+| 2 | `switch_2` | `false` | Kanal 2 OFF |
+| 3 | `switch_3` | `false` | Kanal 3 OFF |
+| 4 | `switch_4` | `false` | Kanal 4 OFF |
+| 5 | `countdown_1` | `0` | Countdown kanal 1, 0 detik |
+| 6 | `countdown_2` | `0` | Countdown kanal 2, 0 detik |
+| 7 | `countdown_3` | `0` | Countdown kanal 3, 0 detik |
+| 8 | `countdown_4` | `0` | Countdown kanal 4, 0 detik |
+
+Catatan: nilai DP merupakan snapshot pada saat pemeriksaan.
+
+### 3. Standard Instruction Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `switch_4` | Boolean | `true`, `false` |
+| 5 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 8 | `countdown_4` | Integer | 0–86400 detik, scale 0, step 1 |
+
+### 4. Standard Status Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `switch_4` | Boolean | `true`, `false` |
+| 5 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 8 | `countdown_4` | Integer | 0–86400 detik, scale 0, step 1 |
+
+### 5. Fitur Timer dan Countdown
+
+| Fitur | Informasi | Status |
+|---|---|---|
+| Countdown | Pengaturan hitung mundur per kanal | Tersedia |
+| Schedule | Penjadwalan ON/OFF berdasarkan waktu | Tersedia di aplikasi |
+| Circulate | Pengaturan siklus ON/OFF | Tersedia pada menu timer sebelumnya |
+| Random | Pengaturan waktu acak | Tersedia pada menu timer sebelumnya |
+| Inching | Otomatis mematikan perangkat setelah durasi tertentu | Tersedia pada menu timer sebelumnya |
+
+Catatan: countdown memiliki DP tersendiri untuk setiap kanal. Konfigurasi jadwal aktual dan format payload Cloud API belum diuji pada perangkat ini.
+
+### 6. Pemetaan Fungsi Backend ELFAN
+
+| Fungsi | DP Code | Status |
+|---|---|---|
+| ON/OFF kanal 1 | `switch_1` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 2 | `switch_2` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 3 | `switch_3` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 4 | `switch_4` | Teridentifikasi; API belum diuji |
+| Countdown kanal 1 | `countdown_1` | Teridentifikasi; API belum diuji |
+| Countdown kanal 2 | `countdown_2` | Teridentifikasi; API belum diuji |
+| Countdown kanal 3 | `countdown_3` | Teridentifikasi; API belum diuji |
+| Countdown kanal 4 | `countdown_4` | Teridentifikasi; API belum diuji |
+| Schedule | Fitur Smart Life | Tersedia di aplikasi; API belum diverifikasi |
+
+### 7. Status Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Identitas dan lokasi | Terdokumentasi |
+| Empat kanal sakelar | Terdokumentasi |
+| Empat kanal countdown | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Fitur timer | Dikonfirmasi pengguna |
+| Pengujian Cloud API | Belum dilakukan |
+
+Kesimpulan: Lampu Ruang Kelas TUK menggunakan perangkat S604 dengan empat kanal sakelar independen dan empat DP countdown. Backend ELFAN perlu memetakan setiap kanal secara terpisah dan mempertahankan identitas perangkat yang unik.
+
+
+# ELFAN — Dokumentasi Perangkat
+## Perangkat 04: Sakelar Teras Kelas TUK
+
+### 1. Informasi Dasar Perangkat
+
+| Parameter | Data |
+|---|---|
+| Gedung | Madinah |
+| Lantai | 2 |
+| Ruangan / Lokasi | Teras Kelas TUK |
+| Nama perangkat | Teras Kelas TUK |
+| Product Name | S604 |
+| Device ID | `a328ecfb2fee44b348yarw` |
+| Product Category | `kg` |
+| Device Status | Online |
+| Activated At | `2026-11-05 09:38:53` |
+| Platform | Tuya Developer / Smart Life |
+| Project | ELFAN-Smart-Building |
+| Association ID | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-Device | No |
+| IP Address | `103.3.220.29` |
+
+### 2. Deskripsi dan Tampilan Perangkat
+
+S604 merupakan smart switch empat kanal. Keempat kanal dapat dikendalikan secara independen melalui aplikasi Smart Life.
+
+Tampilan aplikasi menunjukkan empat kontrol:
+- Switch 1
+- Switch 2
+- Switch 3
+- Switch 4
+
+Pada bagian bawah aplikasi tersedia empat menu:
+- All ON
+- Timer
+- Countdown
+- All OFF
+
+Pemetaan beban listrik atau nama perangkat fisik yang terhubung ke masing-masing kanal belum diberikan.
+
+### 3. JSON Editor — Nilai DP Saat Pemeriksaan
+
+| No. | DP Code | Tipe Data | Nilai Saat Pemeriksaan | Keterangan |
+|---:|---|---|---|---|
+| 1 | `switch_1` | Boolean | `false` | Kanal 1 OFF |
+| 2 | `switch_2` | Boolean | `false` | Kanal 2 OFF |
+| 3 | `switch_3` | Boolean | `false` | Kanal 3 OFF |
+| 4 | `switch_4` | Boolean | `false` | Kanal 4 OFF |
+| 5 | `countdown_1` | Integer | `0` | Countdown kanal 1 |
+| 6 | `countdown_2` | Integer | `0` | Countdown kanal 2 |
+| 7 | `countdown_3` | Integer | `0` | Countdown kanal 3 |
+| 8 | `countdown_4` | Integer | `0` | Countdown kanal 4 |
+
+Catatan: nilai di atas merupakan snapshot saat pemeriksaan, bukan jaminan status terkini.
+
+### 4. Standard Instruction Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `switch_4` | Boolean | `true`, `false` |
+| 5 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 8 | `countdown_4` | Integer | 0–86400 detik, scale 0, step 1 |
+
+Keterangan:
+- Boolean `true` berarti ON.
+- Boolean `false` berarti OFF.
+- Countdown menggunakan satuan detik.
+- Nilai minimum countdown adalah 0 detik.
+- Nilai maksimum countdown adalah 86400 detik (24 jam).
+- Step perubahan countdown adalah 1 detik.
+
+### 5. Standard Status Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `switch_4` | Boolean | `true`, `false` |
+| 5 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 8 | `countdown_4` | Integer | 0–86400 detik, scale 0, step 1 |
+
+### 6. Fitur Kontrol, Timer, dan Countdown
+
+| Fitur | Fungsi / Informasi | Status |
+|---|---|---|
+| Switch 1 | Kontrol ON/OFF kanal 1 | DP teridentifikasi |
+| Switch 2 | Kontrol ON/OFF kanal 2 | DP teridentifikasi |
+| Switch 3 | Kontrol ON/OFF kanal 3 | DP teridentifikasi |
+| Switch 4 | Kontrol ON/OFF kanal 4 | DP teridentifikasi |
+| All ON | Kontrol seluruh kanal menjadi ON | Tersedia pada aplikasi |
+| All OFF | Kontrol seluruh kanal menjadi OFF | Tersedia pada aplikasi |
+| Timer | Menu pengaturan timer pada aplikasi Smart Life | Tersedia pada tampilan |
+| Countdown | Hitung mundur dengan DP tersendiri untuk setiap kanal | DP tersedia |
+
+#### 6.1 Countdown
+
+Setiap kanal mempunyai DP countdown masing-masing:
+
+| Kanal | DP Code | Rentang |
+|---|---|---|
+| Switch 1 | `countdown_1` | 0–86400 detik |
+| Switch 2 | `countdown_2` | 0–86400 detik |
+| Switch 3 | `countdown_3` | 0–86400 detik |
+| Switch 4 | `countdown_4` | 0–86400 detik |
+
+Contoh konversi durasi:
+- 1 menit = 60 detik
+- 5 menit = 300 detik
+- 10 menit = 600 detik
+- 30 menit = 1800 detik
+- 1 jam = 3600 detik
+- 12 jam = 43200 detik
+- 24 jam = 86400 detik
+
+Efek akhir countdown terhadap kondisi switch belum dikonfirmasi melalui pengujian langsung. Jangan mengasumsikan apakah countdown mengubah kanal menjadi ON atau OFF sebelum perilaku perangkat diuji.
+
+#### 6.2 Timer
+
+Menu Timer terlihat pada antarmuka Smart Life. Detail jenis jadwal, pengulangan, konfigurasi, serta mekanisme pengelolaan melalui Tuya Cloud API belum tersedia pada data pemeriksaan perangkat ini.
+
+Timer terjadwal harus dibedakan dari DP countdown. Keberadaan menu Timer pada aplikasi tidak dengan sendirinya membuktikan bahwa seluruh pengaturan tersebut dapat dibuat atau dibaca melalui DP countdown.
+
+### 7. Pemetaan Fungsi Backend ELFAN
+
+| Fungsi | DP Code / Sumber | Status |
+|---|---|---|
+| ON/OFF kanal 1 | `switch_1` | DP teridentifikasi; API belum diuji |
+| ON/OFF kanal 2 | `switch_2` | DP teridentifikasi; API belum diuji |
+| ON/OFF kanal 3 | `switch_3` | DP teridentifikasi; API belum diuji |
+| ON/OFF kanal 4 | `switch_4` | DP teridentifikasi; API belum diuji |
+| All ON | `switch_1` sampai `switch_4` | Tersedia di aplikasi; implementasi API belum diuji |
+| All OFF | `switch_1` sampai `switch_4` | Tersedia di aplikasi; implementasi API belum diuji |
+| Countdown kanal 1 | `countdown_1` | DP teridentifikasi; API belum diuji |
+| Countdown kanal 2 | `countdown_2` | DP teridentifikasi; API belum diuji |
+| Countdown kanal 3 | `countdown_3` | DP teridentifikasi; API belum diuji |
+| Countdown kanal 4 | `countdown_4` | DP teridentifikasi; API belum diuji |
+| Timer terjadwal | Fitur Timer Smart Life | Tersedia di aplikasi; API belum diverifikasi |
+
+### 8. Contoh Struktur Data Inventaris ELFAN
+
+```json
+{
+  "teras_kelas_tuk": {
+    "name": "Teras Kelas TUK",
+    "building": "madinah",
+    "floor": 2,
+    "room": "teras_kelas_tuk",
+    "product": "S604",
+    "device_id": "a328ecfb2fee44b348yarw",
+    "category": "kg",
+    "protocol": "tuya",
+    "type": "multi_channel_switch",
+    "channel_count": 4,
+    "channels": {
+      "1": {
+        "switch_code": "switch_1",
+        "countdown_code": "countdown_1"
+      },
+      "2": {
+        "switch_code": "switch_2",
+        "countdown_code": "countdown_2"
+      },
+      "3": {
+        "switch_code": "switch_3",
+        "countdown_code": "countdown_3"
+      },
+      "4": {
+        "switch_code": "switch_4",
+        "countdown_code": "countdown_4"
+      }
+    },
+    "capabilities": [
+      "ON",
+      "OFF",
+      "ALL_ON",
+      "ALL_OFF",
+      "COUNTDOWN",
+      "TIMER"
+    ]
+  }
+}
+```
+
+### 9. Skenario Pengujian
+
+| No. | Pengujian | Hasil yang Diharapkan |
+|---:|---|---|
+| 1 | Nyalakan Switch 1 | `switch_1 = true` |
+| 2 | Matikan Switch 1 | `switch_1 = false` |
+| 3 | Nyalakan Switch 2 | `switch_2 = true` |
+| 4 | Nyalakan Switch 3 | `switch_3 = true` |
+| 5 | Nyalakan Switch 4 | `switch_4 = true` |
+| 6 | All ON | Keempat switch menjadi `true` |
+| 7 | All OFF | Keempat switch menjadi `false` |
+| 8 | Countdown 1 menit pada kanal 1 | `countdown_1 = 60` |
+| 9 | Countdown 10 menit pada kanal 2 | `countdown_2 = 600` |
+| 10 | Countdown 1 jam pada kanal 3 | `countdown_3 = 3600` |
+| 11 | Countdown 24 jam pada kanal 4 | `countdown_4 = 86400` |
+| 12 | Countdown di luar rentang | Ditolak oleh validasi ELFAN |
+| 13 | Membaca status perangkat | Seluruh DP switch dan countdown terbaca |
+
+Hasil yang diharapkan di atas merupakan target pengujian, bukan hasil pengujian yang sudah dilakukan.
+
+### 10. Status Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Identitas perangkat | Terdokumentasi |
+| Lokasi Gedung Madinah Lantai 2 | Terkonfirmasi |
+| Lokasi Teras Kelas TUK | Terkonfirmasi |
+| Empat kanal switch | Terdokumentasi |
+| Empat DP countdown | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Menu Timer dan Countdown pada aplikasi | Terkonfirmasi melalui tangkapan layar |
+| Payload Cloud API | Belum diuji |
+| Perilaku akhir countdown | Belum diuji |
+| Pengaturan Timer melalui Cloud API | Belum diverifikasi |
+| Pemetaan beban fisik tiap kanal | Belum diberikan |
+
+**Kesimpulan:** Teras Kelas TUK berada di Gedung Madinah Lantai 2 dan menggunakan smart switch Tuya S604 dengan empat kanal independen. Setiap kanal mempunyai DP switch dan countdown masing-masing. Perangkat menyediakan menu All ON, Timer, Countdown, dan All OFF pada aplikasi Smart Life. Backend ELFAN harus mempertahankan pemetaan empat kanal secara terpisah dan tidak menyamakan Timer terjadwal dengan Countdown.
+"""

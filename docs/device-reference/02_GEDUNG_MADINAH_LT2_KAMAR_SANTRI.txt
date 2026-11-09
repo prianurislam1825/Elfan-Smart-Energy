@@ -1,0 +1,397 @@
+ELFAN V2 — REFERENSI PERANGKAT & LOKASI
+Dokumen: Gedung Madinah, Lantai 2 — Kamar Santri
+Sumber: Gedung Madinah Lantai 2 Ruang Kamar Santri(2).txt
+Status: Referensi yang diberikan pengguna; isi teknis dipertahankan.
+Aturan: Nilai snapshot bukan status real-time. Bagian yang ditandai belum diuji tidak boleh dianggap sebagai kontrak API terverifikasi.
+==============================================================================
+
+# ELFAN — Dokumentasi Perangkat
+## BARDI Smart Wall Socket — AC Kamar Santri (Gedung Madinah Lt 2 Ruang Kamar Santri)
+
+### 1. Informasi Dasar Perangkat
+
+| Parameter | Data |
+|---|---|
+| Nama perangkat | AC Kamar Santri |
+| Merek / produk | BARDI Smart Wall Socket |
+| Kategori Tuya | `cz` |
+| Device ID | `a3fd5aa98ba7ca3de00o6ze`* |
+| Status perangkat | Online |
+| Platform | Tuya Developer / Smart Life |
+| Nama proyek | ELFAN-Smart-Building |
+| Data Center | Singapore |
+| Association ID | `gg-104877865119244591275` |
+
+*Device ID disalin dari screenshot dan perlu diverifikasi sebelum digunakan dalam konfigurasi backend.
+
+### 2. Tabel Data Point (DP) Perangkat
+
+Data berikut terlihat pada halaman Device Debugging.
+
+| No. | DP Code | Tipe Data | Nilai Saat Screenshot | Fungsi |
+|---:|---|---|---|---|
+| 1 | `switch_1` | Boolean | `false` | Status sakelar ON/OFF |
+| 2 | `countdown_1` | Integer | `0` | Pengatur hitung mundur dalam detik |
+| 3 | `relay_status` | Enum / String | `"2"` | Status relay; arti nilai perlu diverifikasi |
+| 4 | `random_time` | String | `""` | Konfigurasi waktu acak |
+| 5 | `cycle_time` | String | `""` | Konfigurasi waktu siklus |
+| 6 | `switch_inching` | String | `"AAAC"` | Konfigurasi fungsi inching; format perlu diverifikasi |
+
+### 2A. Standard Status Set
+
+Perangkat: BARDI Smart Wall Socket — AC Kamar Santri
+
+| No. | DP Code | Tipe Data | Spesifikasi | Fungsi / Catatan |
+|---:|---|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` | Status sakelar |
+| 2 | `countdown_1` | Integer | 0–86400 detik, step 1 | Hitung mundur |
+| 3 | `add_ele` | Integer | 0–50000, scale 3, step 100, kW·h | Energi terakumulasi |
+| 4 | `cur_current` | Integer | 0–30000 mA, step 1 | Arus saat ini |
+| 5 | `cur_power` | Integer | 0–50000 W, scale 1, step 1 | Daya saat ini |
+| 6 | `cur_voltage` | Integer | 0–5000 V, scale 1, step 1 | Tegangan saat ini |
+| 7 | `test_bit` | Integer | 0–5, step 1 | Fungsi belum teridentifikasi |
+| 8 | `fault` | Bitmap | `ov_cr`, `ov_vol`, `ov_pwr`, `ls_cr`, `ls_vol`, `ls_pow` | Indikator gangguan |
+| 9 | `relay_status` | Enum | `"0"`, `"1"`, `"2"` | Status relay; arti tiap nilai belum dipastikan |
+| 10 | `random_time` | String | Maksimum 255 karakter | Konfigurasi waktu acak |
+| 11 | `cycle_time` | String | Maksimum 255 karakter | Konfigurasi waktu siklus |
+| 12 | `switch_inching` | String | Maksimum 255 karakter | Konfigurasi inching |
+
+Catatan:
+- Nilai `scale` dipertahankan sesuai spesifikasi yang ditampilkan Tuya.
+- Konversi nilai mentah ke nilai aktual perlu diverifikasi sebelum diterapkan pada pembacaan energi, daya, dan tegangan.
+- Makna setiap bit pada `fault` dan nilai `relay_status` belum dipastikan.
+
+
+### 2B. Standard Instruction Set
+
+Perangkat: BARDI Smart Wall Socket — AC Kamar Santri
+
+| No. | DP Code | Tipe Data | Spesifikasi | Fungsi / Catatan |
+|---:|---|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` | Instruksi sakelar ON/OFF |
+| 2 | `countdown_1` | Integer | 0–86400 detik, step 1 | Instruksi hitung mundur |
+| 3 | `relay_status` | Enum | `"0"`, `"1"`, `"2"` | Instruksi/status relay; semantik perlu diverifikasi |
+| 4 | `random_time` | String | Maksimum 255 karakter | Konfigurasi waktu acak |
+| 5 | `cycle_time` | String | Maksimum 255 karakter | Konfigurasi waktu siklus |
+| 6 | `switch_inching` | String | Maksimum 255 karakter | Konfigurasi inching |
+
+Catatan:
+- Tabel ini mengikuti daftar Standard Instruction Set yang diberikan.
+- Keberadaan DP pada daftar ini belum membuktikan bahwa semua DP dapat ditulis melalui Cloud API.
+- Format payload `random_time`, `cycle_time`, dan `switch_inching` belum diketahui.
+
+
+### 3. Tabel Spesifikasi DP
+
+Spesifikasi yang terlihat pada Standard Instruction Set.
+
+| DP Code | Tipe | Ketentuan |
+|---|---|---|
+| `switch_1` | Boolean | Nilai `true` atau `false` |
+| `countdown_1` | Integer | Minimum 0, maksimum 86400, satuan detik, langkah 1 |
+| `relay_status` | Enum | Pilihan nilai `"0"`, `"1"`, `"2"`; pemetaan arti belum dipastikan |
+| `light_mode` | Enum | Nilai yang terlihat: `relay`, `pos`, `none` |
+| `child_lock` | Boolean | Status kunci perangkat |
+| `random_time` | String | Maksimum 255 karakter |
+| `cycle_time` | String | Maksimum 255 karakter |
+| `switch_inching` | String | Maksimum 255 karakter |
+
+### 4. Tabel Pemantauan Listrik
+
+Nilai yang terlihat pada halaman Electricity. Angka berikut merupakan snapshot screenshot, bukan hasil pembacaan API langsung.
+
+| Parameter | Nilai |
+|---|---:|
+| Konsumsi hari ini | 7,78 kWh |
+| Arus saat screenshot | 0 mA |
+| Daya saat screenshot | 0 W |
+| Tegangan | 226,4 V |
+| Total konsumsi | 315,03 kWh |
+
+### 5. Tabel Fitur Timer dan Otomatisasi
+
+| Fitur | Informasi yang Terlihat | Status |
+|---|---|---|
+| Countdown | Pengatur waktu hitung mundur | Perlu pengujian |
+| Schedule | Mendukung jadwal berdasarkan hari dan waktu | Ada jadwal tersimpan |
+| Circulate | Menu pengaturan siklus | Belum ada jadwal |
+| Random | Menu pengaturan waktu acak | Belum ada jadwal |
+| Inching | Otomatis mematikan perangkat setelah durasi tertentu | Toggle OFF; durasi terlihat 2 detik |
+| Astronomical | Otomatisasi berdasarkan matahari terbit/terbenam | Toggle OFF; lokasi/waktu astronomis belum tersedia |
+
+### 6. Jadwal yang Terlihat
+
+| Waktu | Hari | Perintah |
+|---|---|---|
+| 03.25 | Setiap hari | Switch 1 OFF |
+| 11.30 | Senin–Sabtu | Switch 1 ON |
+| 13.00 | Senin–Sabtu | Switch 1 OFF |
+| 14.30 | Senin–Sabtu | Switch 1 OFF |
+
+Catatan: screenshot menampilkan waktu dalam format AM/PM. Tabel di atas mengikuti waktu yang terlihat; zona waktu dan konsistensi jadwal dengan waktu lokal perlu diverifikasi.
+
+### 7. Kebutuhan Integrasi ke ELFAN
+
+| Fitur | Kebutuhan Verifikasi |
+|---|---|
+| ON/OFF | Uji perintah `switch_1` melalui Tuya Cloud API |
+| Countdown | Uji pengiriman `countdown_1` dan perilaku perangkat |
+| Status relay | Pastikan arti setiap nilai `relay_status` |
+| Monitoring listrik | Pastikan DP pengukuran listrik tersedia dan dapat dibaca melalui API |
+| Schedule | Pastikan apakah jadwal dikelola aplikasi atau dapat diakses melalui API |
+| Circulate / Random | Verifikasi format payload dan dukungan API |
+| Inching | Verifikasi format `switch_inching` |
+| Child lock / light mode | Verifikasi fungsi dan nilai yang didukung perangkat |
+
+### 8. Status Kelengkapan Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Informasi dasar | Terdokumentasi sebagian |
+| DP dan nilai saat screenshot | Terdokumentasi |
+| Tipe data dan rentang nilai | Terdokumentasi sebagian |
+| Konsumsi listrik | Nilai screenshot tersedia |
+| Timer dan jadwal | Informasi antarmuka tersedia |
+| Format API untuk setiap fungsi | Belum lengkap |
+| Pembacaan status listrik melalui API | Belum diverifikasi |
+| Pengujian langsung melalui backend ELFAN | Belum diverifikasi |
+
+**Kesimpulan:** Screenshot yang tersedia cukup untuk inventaris awal dan dokumentasi konfigurasi perangkat. Namun, dokumentasi integrasi backend belum lengkap sampai format API, DP pengukuran listrik, dan hasil pengujian perintah terverifikasi.
+
+
+# ELFAN — Dokumentasi Perangkat
+## Perangkat 02: Gedung Madinah Lantai 2 Ruang Kamar santri Kipas Kamar Santri
+
+### 1. Lokasi dan Informasi Dasar
+
+| Parameter | Data |
+|---|---|
+| Gedung | Madinah |
+| Lantai | 2 |
+| Ruangan | Kamar Santri |
+| Nama perangkat | Kipas Kamar Santri |
+| Product Name | T34-Smart Plug+ |
+| Device ID | `a392612d43cddd0663zybp` |
+| Product Category | `tdq` |
+| Device Status | Online |
+| Activated At | `2026-10-09 09:27:48` |
+| Platform | Tuya Developer / Smart Life |
+| Project | ELFAN-Smart-Building |
+| Association ID | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-device | No |
+| IP Address | `157.85.211.243` |
+
+### 2. Device Debugging — Nilai DP
+
+| No. | DP Code | Nilai Saat Pemeriksaan | Catatan |
+|---:|---|---|---|
+| 1 | `switch_1` | `false` | Sakelar sedang OFF saat pemeriksaan |
+| 2 | `countdown_1` | `0` | Countdown bernilai 0 detik |
+| 3 | `relay_status` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 4 | `random_time` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 5 | `cycle_time` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 6 | `switch_inching` | Tidak ditampilkan | Nilai aktual belum diketahui |
+
+Catatan: DP yang tidak memiliki properti `value` pada JSON tidak boleh dianggap memiliki nilai kosong atau nilai default.
+
+### 3. Standard Instruction Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 3 | `relay_status` | Enum | `"0"`, `"1"`, `"2"` |
+| 4 | `random_time` | String | Maksimum 255 karakter |
+| 5 | `cycle_time` | String | Maksimum 255 karakter |
+| 6 | `switch_inching` | String | Maksimum 255 karakter |
+
+### 4. Standard Status Set
+
+| No. | DP Code | Tipe Data | Spesifikasi | Fungsi / Catatan |
+|---:|---|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` | Status sakelar |
+| 2 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 | Countdown |
+| 3 | `add_ele` | Integer | 0–50000, scale 3, step 100, kW·h | Energi terakumulasi |
+| 4 | `cur_current` | Integer | 0–30000 mA, step 1 | Arus saat ini |
+| 5 | `cur_power` | Integer | 0–50000 W, scale 1, step 1 | Daya saat ini |
+| 6 | `cur_voltage` | Integer | 0–5000 V, scale 1, step 1 | Tegangan saat ini |
+| 7 | `test_bit` | Integer | 0–5, step 1 | Fungsi belum teridentifikasi |
+| 8 | `fault` | Bitmap | `ov_cr`, `ov_vol`, `ov_pwr`, `ls_cr`, `ls_vol`, `ls_pow` | Indikator gangguan |
+| 9 | `relay_status` | Enum | `"0"`, `"1"`, `"2"` | Arti nilai belum diverifikasi |
+| 10 | `random_time` | String | Maksimum 255 karakter | Konfigurasi waktu acak |
+| 11 | `cycle_time` | String | Maksimum 255 karakter | Konfigurasi waktu siklus |
+| 12 | `switch_inching` | String | Maksimum 255 karakter | Konfigurasi inching |
+
+### 5. Fitur Timer dan Otomatisasi
+
+Menurut informasi pengguna, tampilan fitur timer pada Smart Life sama dengan perangkat AC Kamar Santri.
+
+| Fitur | Informasi | Status |
+|---|---|---|
+| Countdown | DP `countdown_1`, rentang 0–86400 detik | Spesifikasi tersedia |
+| Schedule | Tampilan fitur sama dengan AC Kamar Santri | Dikonfirmasi pengguna |
+| Circulate | Menu timer tersedia pada tampilan yang sama | Detail konfigurasi belum diperiksa |
+| Random | Menu timer tersedia pada tampilan yang sama | Detail konfigurasi belum diperiksa |
+| Inching | Menu timer tersedia pada tampilan yang sama | Format DP belum diperiksa |
+| Astronomical | Menu timer tersedia pada tampilan yang sama | Konfigurasi aktual belum diperiksa |
+
+Kesamaan tampilan timer tidak membuktikan bahwa jadwal atau konfigurasi kedua perangkat identik.
+
+### 6. Monitoring Listrik (Electricity)
+
+Perangkat memiliki DP pengukuran listrik pada Standard Status Set.
+
+| Parameter | DP Code | Satuan | Status |
+|---|---|---|---|
+| Energi terakumulasi | `add_ele` | kW·h | DP tersedia; nilai aktual belum diberikan |
+| Arus | `cur_current` | mA | DP tersedia; nilai aktual belum diberikan |
+| Daya | `cur_power` | W | DP tersedia; nilai aktual belum diberikan |
+| Tegangan | `cur_voltage` | V | DP tersedia; nilai aktual belum diberikan |
+| Gangguan listrik | `fault` | Bitmap | DP tersedia; pemetaan bit belum diverifikasi |
+
+Catatan: konversi skala data mentah harus diverifikasi sebelum diterapkan pada dashboard atau perhitungan energi ELFAN.
+
+### 7. Pemetaan Fungsi Backend ELFAN
+
+| Fungsi | Sumber DP | Status |
+|---|---|---|
+| Kipas ON/OFF | `switch_1` | DP teridentifikasi; API belum diuji |
+| Status sakelar | `switch_1` | DP teridentifikasi; pembacaan API belum diuji |
+| Countdown | `countdown_1` | Spesifikasi tersedia; pengujian belum dilakukan |
+| Monitoring energi | `add_ele` | DP tersedia; pembacaan API belum diuji |
+| Monitoring arus | `cur_current` | DP tersedia; pembacaan API belum diuji |
+| Monitoring daya | `cur_power` | DP tersedia; pembacaan API belum diuji |
+| Monitoring tegangan | `cur_voltage` | DP tersedia; pembacaan API belum diuji |
+| Deteksi gangguan | `fault` | Pemetaan bit perlu diverifikasi |
+| Schedule dan otomatisasi | DP timer terkait | Format payload dan akses API belum diuji |
+
+### 8. Status Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Identitas dan lokasi perangkat | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Fitur timer | Jenis fitur diketahui; detail konfigurasi belum lengkap |
+| DP monitoring listrik | Teridentifikasi |
+| Nilai aktual monitoring listrik | Belum diberikan |
+| Format payload timer | Belum diverifikasi |
+| Integrasi API dan backend | Belum diuji |
+
+Kesimpulan: Kipas Kamar Santri menggunakan T34-Smart Plug+ dengan kategori Tuya `tdq`. Perangkat menyediakan DP sakelar, countdown, dan monitoring listrik. Kemampuan serta format akses melalui Cloud API harus diuji sebelum diimplementasikan ke backend Raspberry Pi dan aplikasi ELFAN.
+
+
+# ELFAN — Dokumentasi Perangkat
+## Perangkat 03
+: Lampu Kamar Santri
+
+### 1. Informasi Dasar Perangkat
+
+| Parameter | Data |
+|---|---|
+| Gedung | Madinah |
+| Lantai | 2 |
+| Ruangan | Kamar Santri |
+| Nama perangkat | Lampu Kamar Santri |
+| Product Name | iHome By Danhan Wall Switch 3 Gang |
+| Device ID | `a3050c99312a4525837nvp` |
+| Product Category | `kg` |
+| Device Status | Online |
+| Activated At | `2026-10-09 09:34:34` |
+| Platform | Tuya Developer / Smart Life |
+| Project | ELFAN-Smart-Building |
+| Association ID | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-device | No |
+| IP Address | `157.85.211.243` |
+
+### 2. Device Debugging — Nilai DP
+
+| No. | DP Code | Nilai Saat Pemeriksaan | Catatan |
+|---:|---|---|---|
+| 1 | `switch_1` | `false` | Kanal 1 OFF |
+| 2 | `countdown_1` | `0` | Countdown kanal 1 bernilai 0 detik |
+| 3 | `relay_status` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 4 | `random_time` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 5 | `cycle_time` | Tidak ditampilkan | Nilai aktual belum diketahui |
+| 6 | `switch_inching` | Tidak ditampilkan | Nilai aktual belum diketahui |
+
+Catatan: JSON Debugging yang diberikan hanya mencantumkan `switch_1` dan `countdown_1` dengan nilai. Nilai aktual `switch_2`, `switch_3`, `countdown_2`, `countdown_3`, serta `switch_backlight` belum diberikan.
+
+### 3. Standard Instruction Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 5 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `relay_status` | Enum | `power_off`, `power_on`, `last` |
+| 8 | `switch_backlight` | Boolean | `true`, `false` |
+| 9 | `cycle_time` | String | Spesifikasi detail belum tersedia |
+| 10 | `random_time` | String | Spesifikasi detail belum tersedia |
+| 11 | `switch_inching` | String | Spesifikasi detail belum tersedia |
+
+### 4. Standard Status Set
+
+| No. | DP Code | Tipe Data | Spesifikasi |
+|---:|---|---|---|
+| 1 | `switch_1` | Boolean | `true`, `false` |
+| 2 | `switch_2` | Boolean | `true`, `false` |
+| 3 | `switch_3` | Boolean | `true`, `false` |
+| 4 | `countdown_1` | Integer | 0–86400 detik, scale 0, step 1 |
+| 5 | `countdown_2` | Integer | 0–86400 detik, scale 0, step 1 |
+| 6 | `countdown_3` | Integer | 0–86400 detik, scale 0, step 1 |
+| 7 | `relay_status` | Enum | `power_off`, `power_on`, `last` |
+| 8 | `switch_backlight` | Boolean | `true`, `false` |
+| 9 | `cycle_time` | String | Spesifikasi detail belum tersedia |
+| 10 | `random_time` | String | Spesifikasi detail belum tersedia |
+| 11 | `switch_inching` | String | Spesifikasi detail belum tersedia |
+
+### 5. Antarmuka Perangkat dan Schedule
+
+Berdasarkan screenshot Smart Life yang diberikan:
+
+| Fitur | Informasi |
+|---|---|
+| Jumlah kanal sakelar | 3 kanal |
+| Switch 1 | Kanal sakelar pertama |
+| Switch 2 | Kanal sakelar kedua |
+| Switch 3 | Kanal sakelar ketiga |
+| Schedule | Halaman jadwal menyediakan pilihan Switch 1, Switch 2, dan Switch 3 |
+| Jadwal yang terlihat | Setiap hari pukul 03.30 AM — Switch 1 ON |
+| Status jadwal | Aktif pada screenshot |
+
+Catatan: jadwal tersebut merupakan konfigurasi yang terlihat pada screenshot. Belum diketahui apakah terdapat jadwal lain untuk Switch 2 dan Switch 3.
+
+### 6. Pemetaan Fungsi Backend ELFAN
+
+| Fungsi | DP | Status |
+|---|---|---|
+| ON/OFF kanal 1 | `switch_1` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 2 | `switch_2` | Teridentifikasi; API belum diuji |
+| ON/OFF kanal 3 | `switch_3` | Teridentifikasi; API belum diuji |
+| Countdown kanal 1 | `countdown_1` | Teridentifikasi; API belum diuji |
+| Countdown kanal 2 | `countdown_2` | Teridentifikasi; API belum diuji |
+| Countdown kanal 3 | `countdown_3` | Teridentifikasi; API belum diuji |
+| Pengaturan lampu indikator sakelar | `switch_backlight` | DP teridentifikasi; perilaku perlu diuji |
+| Pengaturan relay | `relay_status` | Nilai tersedia; perilaku perlu diverifikasi |
+| Schedule | Fitur Smart Life | Perlu verifikasi akses dan mekanisme API |
+
+### 7. Status Dokumentasi
+
+| Bagian | Status |
+|---|---|
+| Identitas dan lokasi | Terdokumentasi |
+| Standard Instruction Set | Terdokumentasi |
+| Standard Status Set | Terdokumentasi |
+| Tiga kanal sakelar | Teridentifikasi |
+| Schedule per kanal | Antarmuka teridentifikasi |
+| Nilai aktual seluruh kanal | Belum lengkap |
+| Format payload timer | Belum diverifikasi |
+| Integrasi Cloud API | Belum diuji |
+
+Kesimpulan: Lampu Kamar Santri menggunakan iHome By Danhan Wall Switch 3 Gang dengan tiga kanal sakelar independen. Implementasi ELFAN perlu memetakan setiap kanal dan countdown secara terpisah, serta tidak menganggap jadwal Smart Life dapat dikelola melalui Cloud API sebelum dukungannya diverifikasi.

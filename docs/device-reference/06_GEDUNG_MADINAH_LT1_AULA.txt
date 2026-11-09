@@ -1,0 +1,504 @@
+ELFAN V2 — REFERENSI PERANGKAT & LOKASI
+Dokumen: Gedung Madinah, Lantai 1 — Aula
+Sumber: Aula lantai 1 gedung madinah(2).txt
+Status: Referensi yang diberikan pengguna; isi teknis dipertahankan.
+Aturan: Nilai snapshot bukan status real-time. Bagian yang ditandai belum diuji tidak boleh dianggap sebagai kontrak API terverifikasi.
+==============================================================================
+
+# DOKUMENTASI PERANGKAT ELFAN
+## Gedung Madinah – Lantai 1 – Ruang Aula
+
+### 1. Identitas Perangkat
+
+| Parameter | Keterangan |
+|---|---|
+| Nama Perangkat | Lampu Sorot Aula |
+| Product Name | S604 |
+| Device ID | `a31defc9bd81bd6401cyje` |
+| Product Category | `kg` |
+| Device Status | Online |
+| Activated At | 8 Oktober 2026, 10:20:06 |
+| IP Address | `157.85.211.243` |
+| Project | ELFAN-Smart-Building |
+| Association | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-Device | No |
+
+### 2. Deskripsi Perangkat
+
+Lampu Sorot Aula merupakan perangkat sakelar pintar dengan empat kanal (4 Gang) yang digunakan untuk mengendalikan lampu sorot di Aula Gedung Madinah lantai 1.
+
+Perangkat terhubung ke platform Tuya dan dapat dikendalikan melalui aplikasi Smart Life. Setiap kanal memiliki kontrol ON/OFF secara individual.
+
+### 3. Konfigurasi Data Point (DP)
+
+#### 3.1. Switch Control
+
+| Data Point | Tipe | Fungsi |
+|---|---|---|
+| `switch_1` | Boolean | Kontrol sakelar 1 |
+| `switch_2` | Boolean | Kontrol sakelar 2 |
+| `switch_3` | Boolean | Kontrol sakelar 3 |
+| `switch_4` | Boolean | Kontrol sakelar 4 |
+
+Nilai:
+- `true` = ON
+- `false` = OFF
+
+#### 3.2. Countdown
+
+| Data Point | Tipe | Rentang | Fungsi |
+|---|---|---|---|
+| `countdown_1` | Integer | 0–86.400 detik | Countdown sakelar 1 |
+| `countdown_2` | Integer | 0–86.400 detik | Countdown sakelar 2 |
+| `countdown_3` | Integer | 0–86.400 detik | Countdown sakelar 3 |
+| `countdown_4` | Integer | 0–86.400 detik | Countdown sakelar 4 |
+
+Ketentuan:
+- Satuan waktu menggunakan detik.
+- Nilai minimum: 0 detik.
+- Nilai maksimum: 86.400 detik (24 jam).
+- Setiap kanal memiliki parameter countdown tersendiri.
+
+### 4. JSON Editor
+
+Konfigurasi DP yang terdeteksi pada Tuya Developer:
+
+```json
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "switch_2",
+    "value": false
+  },
+  {
+    "code": "switch_3",
+    "value": false
+  },
+  {
+    "code": "switch_4",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "countdown_2",
+    "value": 0
+  },
+  {
+    "code": "countdown_3",
+    "value": 0
+  },
+  {
+    "code": "countdown_4",
+    "value": 0
+  }
+]
+```
+
+### 5. Standard Instruction Set
+
+| Code | Type | Values |
+|---|---|---|
+| `switch_1` | Boolean | true / false |
+| `switch_2` | Boolean | true / false |
+| `switch_3` | Boolean | true / false |
+| `switch_4` | Boolean | true / false |
+| `countdown_1` | Integer | 0–86.400 detik |
+| `countdown_2` | Integer | 0–86.400 detik |
+| `countdown_3` | Integer | 0–86.400 detik |
+| `countdown_4` | Integer | 0–86.400 detik |
+
+### 6. Standard Status Set
+
+Perangkat melaporkan status melalui DP yang sama dengan konfigurasi Instruction Set:
+
+| Code | Type | Keterangan |
+|---|---|---|
+| `switch_1` | Boolean | Status sakelar 1 |
+| `switch_2` | Boolean | Status sakelar 2 |
+| `switch_3` | Boolean | Status sakelar 3 |
+| `switch_4` | Boolean | Status sakelar 4 |
+| `countdown_1` | Integer | Status countdown sakelar 1 |
+| `countdown_2` | Integer | Status countdown sakelar 2 |
+| `countdown_3` | Integer | Status countdown sakelar 3 |
+| `countdown_4` | Integer | Status countdown sakelar 4 |
+
+### 7. Fitur Perangkat
+
+| Fitur | Ketersediaan | Keterangan |
+|---|---|---|
+| ON/OFF Individual | Tersedia | Kontrol masing-masing kanal |
+| All ON | Tersedia | Menyalakan seluruh kanal melalui aplikasi |
+| All OFF | Tersedia | Mematikan seluruh kanal melalui aplikasi |
+| Timer | Tersedia | Pengaturan waktu melalui aplikasi Smart Life |
+| Countdown | Tersedia | Pengaturan hitung mundur untuk kanal sakelar |
+| IR Control | Tidak diperlukan | Menggunakan sakelar listrik pintar secara langsung |
+
+### 8. Pemetaan Fungsi ELFAN
+
+| Fungsi ELFAN | Data Point | Keterangan |
+|---|---|---|
+| Kontrol Lampu 1 | `switch_1` | ON/OFF |
+| Kontrol Lampu 2 | `switch_2` | ON/OFF |
+| Kontrol Lampu 3 | `switch_3` | ON/OFF |
+| Kontrol Lampu 4 | `switch_4` | ON/OFF |
+| Timer Lampu 1–4 | Timer masing-masing kanal | Mengikuti dukungan fitur perangkat |
+| Countdown Lampu 1 | `countdown_1` | Hitung mundur |
+| Countdown Lampu 2 | `countdown_2` | Hitung mundur |
+| Countdown Lampu 3 | `countdown_3` | Hitung mundur |
+| Countdown Lampu 4 | `countdown_4` | Hitung mundur |
+
+Catatan: Nama fisik atau pembagian area untuk masing-masing kanal belum dipetakan.
+
+### 9. Rencana Integrasi Sistem ELFAN
+
+**Backend Raspberry Pi**
+- Registrasi perangkat pada Device Registry.
+- Integrasi melalui Tuya Adapter.
+- Pemetaan empat kanal sakelar.
+- Implementasi kontrol ON/OFF individual dan seluruh kanal.
+- Implementasi pembacaan status perangkat.
+- Dukungan countdown per kanal.
+- Dukungan timer sesuai mekanisme yang tersedia pada perangkat dan API.
+
+**Aplikasi ELFAN**
+- Menampilkan perangkat pada lokasi Gedung Madinah → Lantai 1 → Ruang Aula.
+- Menampilkan empat kontrol sakelar.
+- Menyediakan kontrol All ON dan All OFF.
+- Menyediakan pengaturan timer dan countdown.
+- Menampilkan status aktual setiap kanal.
+
+Status integrasi backend dan aplikasi: belum diverifikasi pada tahap inventarisasi ini.
+
+### 10. Kesimpulan
+
+Lampu Sorot Aula menggunakan perangkat S604 dengan empat kanal sakelar. Seluruh kanal memiliki DP ON/OFF dan countdown masing-masing. Aplikasi Smart Life juga menyediakan fitur Timer dan Countdown.
+
+Perangkat dapat dijadikan satu entitas kontrol ELFAN dengan empat kanal independen, tanpa memerlukan integrasi IR.
+
+
+
+# DOKUMENTASI PERANGKAT ELFAN
+## Gedung Madinah – Lantai 1 – Ruang Aula
+
+### 1. Identitas Perangkat
+
+| Parameter | Keterangan |
+|---|---|
+| Nama Perangkat | Lampu Utama Aula |
+| Product Name | BARDI Wallswitch 2 Gang - WHT/BLK |
+| Device ID | `a3fee754efa6eb48b7rqty` |
+| Product Category | `kg` |
+| Device Status | Online |
+| Activated At | 8 Oktober 2026, 09:58:35 |
+| IP Address | `157.85.211.243` |
+| Project | ELFAN-Smart-Building |
+| Association | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-Device | No |
+
+### 2. Deskripsi Perangkat
+
+Lampu Utama Aula menggunakan BARDI Wallswitch 2 Gang yang memiliki dua kanal sakelar untuk mengendalikan dua jalur lampu secara terpisah.
+
+Perangkat terhubung dengan Tuya melalui platform Smart Life dan dapat dikendalikan melalui aplikasi maupun integrasi ELFAN.
+
+### 3. Konfigurasi Data Point (DP)
+
+#### 3.1. Switch Control
+
+| Data Point | Tipe | Fungsi |
+|---|---|---|
+| `switch_1` | Boolean | Kontrol sakelar 1 |
+| `switch_2` | Boolean | Kontrol sakelar 2 |
+
+Nilai:
+- `true` = ON
+- `false` = OFF
+
+#### 3.2. Countdown
+
+| Data Point | Tipe | Rentang | Fungsi |
+|---|---|---|---|
+| `countdown_1` | Integer | 0–86.400 detik | Countdown sakelar 1 |
+| `countdown_2` | Integer | 0–86.400 detik | Countdown sakelar 2 |
+
+Ketentuan:
+- Satuan menggunakan detik.
+- Minimum 0 detik.
+- Maksimum 86.400 detik atau 24 jam.
+- Masing-masing kanal memiliki DP countdown tersendiri.
+
+#### 3.3. DP Tambahan
+
+| Data Point | Tipe | Fungsi |
+|---|---|---|
+| `relay_status` | Enum | Pengaturan kondisi relay setelah perangkat menyala |
+| `switch_backlight` | Boolean | Kontrol lampu indikator sakelar |
+| `cycle_time` | String | Parameter pengaturan siklus |
+| `random_time` | String | Parameter pengaturan waktu acak |
+| `switch_inching` | String | Parameter pengaturan inching |
+
+Nilai `relay_status`:
+- `power_off`
+- `power_on`
+- `last`
+
+### 4. JSON Editor
+
+```json
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "switch_2",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "countdown_2",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "switch_backlight",
+    "value": false
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "switch_inching"
+  }
+]
+```
+
+### 5. Fitur Perangkat
+
+| Fitur | Ketersediaan | Keterangan |
+|---|---|---|
+| ON/OFF Individual | Tersedia | Kontrol dua kanal secara terpisah |
+| All ON | Tersedia | Menyalakan kedua kanal |
+| All OFF | Tersedia | Mematikan kedua kanal |
+| Timer | Tersedia | Terlihat pada aplikasi Smart Life |
+| Countdown DP | Tersedia pada spesifikasi DP | Tersedia untuk kedua kanal; tampilan dan perilaku di aplikasi perlu verifikasi |
+| Relay Status | Tersedia | `power_off`, `power_on`, `last` |
+| Backlight | Tersedia | Kontrol indikator sakelar |
+
+### 6. Pemetaan Fungsi ELFAN
+
+| Fungsi ELFAN | Data Point | Keterangan |
+|---|---|---|
+| Lampu Utama Aula 1 | `switch_1` | ON/OFF |
+| Lampu Utama Aula 2 | `switch_2` | ON/OFF |
+| Countdown Lampu 1 | `countdown_1` | Hitung mundur |
+| Countdown Lampu 2 | `countdown_2` | Hitung mundur |
+| Timer Lampu 1 dan 2 | Timer | Mengikuti dukungan mekanisme perangkat |
+
+Nama fisik jalur lampu untuk masing-masing kanal belum dipetakan secara terperinci.
+
+### 7. Rencana Integrasi ELFAN
+
+**Backend Raspberry Pi**
+- Registrasi perangkat pada Device Registry.
+- Integrasi menggunakan Tuya Adapter.
+- Pemetaan dua kanal sakelar.
+- Kontrol ON/OFF individual dan All ON/All OFF.
+- Pembacaan status perangkat.
+- Dukungan DP countdown.
+- Dukungan timer sesuai mekanisme yang tersedia.
+
+**Aplikasi ELFAN**
+- Menampilkan perangkat pada Gedung Madinah → Lantai 1 → Ruang Aula.
+- Menyediakan dua kontrol sakelar.
+- Menyediakan kontrol All ON dan All OFF.
+- Menyediakan pengaturan timer.
+- Menampilkan status aktual masing-masing kanal.
+
+Status implementasi backend dan aplikasi belum diverifikasi.
+
+### 8. Kesimpulan
+
+Lampu Utama Aula menggunakan BARDI Wallswitch 2 Gang dengan dua kanal kontrol independen. Perangkat memiliki DP switch dan countdown untuk masing-masing kanal serta menyediakan fitur Timer pada aplikasi Smart Life.
+
+Perangkat dapat diintegrasikan ke ELFAN sebagai satu perangkat dengan dua kanal kontrol terpisah tanpa memerlukan IR.
+
+
+
+
+# DOKUMENTASI PERANGKAT ELFAN
+
+## Gedung Madinah – Lantai 1 – Lampu Teras
+
+### 1. Identitas Perangkat
+
+| Parameter        | Keterangan                        |
+| ---------------- | --------------------------------- |
+| Nama Perangkat   | Lampu Teras Gedung Madinah        |
+| Product Name     | BARDI Wallswitch 2 Gang - WHT/BLK |
+| Device ID        | `a3dd34aadae63e477czmwv`          |
+| Product Category | `kg`                              |
+| Device Status    | Online                            |
+| Activated At     | 2 Oktober 2026, 14:29:34          |
+| IP Address       | `157.85.212.191`                  |
+| Project          | ELFAN-Smart-Building              |
+| Association      | `gg-104877865119244591275`        |
+| Data Center      | Singapore Data Center             |
+| Sub-Device       | No                                |
+
+### 2. Deskripsi Perangkat
+
+Lampu Teras Gedung Madinah menggunakan BARDI Wallswitch 2 Gang yang memiliki dua kanal sakelar untuk mengendalikan dua jalur lampu secara terpisah.
+
+Perangkat terhubung dengan Tuya melalui platform Smart Life dan dapat dikendalikan melalui aplikasi maupun integrasi ELFAN.
+
+### 3. Konfigurasi Data Point (DP)
+
+#### 3.1. Switch Control
+
+| Data Point | Tipe    | Fungsi            |
+| ---------- | ------- | ----------------- |
+| `switch_1` | Boolean | Kontrol sakelar 1 |
+| `switch_2` | Boolean | Kontrol sakelar 2 |
+
+Nilai:
+
+- `true` = ON
+- `false` = OFF
+
+#### 3.2. Countdown
+
+| Data Point    | Tipe    | Rentang        | Fungsi              |
+| ------------- | ------- | -------------- | ------------------- |
+| `countdown_1` | Integer | 0–86.400 detik | Countdown sakelar 1 |
+| `countdown_2` | Integer | 0–86.400 detik | Countdown sakelar 2 |
+
+Ketentuan:
+
+- Satuan menggunakan detik.
+- Minimum 0 detik.
+- Maksimum 86.400 detik atau 24 jam.
+- Masing-masing kanal memiliki DP countdown tersendiri.
+
+#### 3.3. DP Tambahan
+
+| Data Point         | Tipe    | Fungsi                                             |
+| ------------------ | ------- | -------------------------------------------------- |
+| `relay_status`     | Enum    | Pengaturan kondisi relay setelah perangkat menyala |
+| `switch_backlight` | Boolean | Kontrol lampu indikator sakelar                    |
+| `cycle_time`       | String  | Parameter pengaturan siklus                        |
+| `random_time`      | String  | Parameter pengaturan waktu acak                    |
+| `switch_inching`   | String  | Parameter pengaturan inching                       |
+
+Nilai `relay_status`:
+
+- `power_off`
+- `power_on`
+- `last`
+
+### 4. JSON Editor
+
+```
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "switch_2",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "countdown_2",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "switch_backlight",
+    "value": false
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "switch_inching"
+  }
+]
+```
+
+### 5. Fitur Perangkat
+
+| Fitur             | Ketersediaan                 | Keterangan                        |
+| ----------------- | ---------------------------- | --------------------------------- |
+| ON/OFF Individual | Tersedia                     | Kontrol dua kanal secara terpisah |
+| All ON            | Tersedia                     | Menyalakan kedua kanal            |
+| All OFF           | Tersedia                     | Mematikan kedua kanal             |
+| Timer             | Tersedia                     | Tersedia pada aplikasi Smart Life |
+| Countdown DP      | Tersedia pada spesifikasi DP | Tersedia untuk kedua kanal        |
+| Relay Status      | Tersedia                     | `power_off`, `power_on`, `last`   |
+| Backlight         | Tersedia                     | Kontrol indikator sakelar         |
+
+### 6. Pemetaan Fungsi ELFAN
+
+| Fungsi ELFAN        | Data Point    | Keterangan                             |
+| ------------------- | ------------- | -------------------------------------- |
+| Lampu Teras 1       | `switch_1`    | ON/OFF                                 |
+| Lampu Teras 2       | `switch_2`    | ON/OFF                                 |
+| Countdown Lampu 1   | `countdown_1` | Hitung mundur                          |
+| Countdown Lampu 2   | `countdown_2` | Hitung mundur                          |
+| Timer Lampu 1 dan 2 | Timer         | Mengikuti dukungan mekanisme perangkat |
+
+Nama fisik jalur lampu untuk masing-masing kanal belum dipetakan secara terperinci.
+
+### 7. Rencana Integrasi ELFAN
+
+Backend Raspberry Pi
+
+- Registrasi perangkat pada Device Registry.
+- Integrasi menggunakan Tuya Adapter.
+- Pemetaan dua kanal sakelar.
+- Kontrol ON/OFF individual dan All ON/All OFF.
+- Pembacaan status perangkat.
+- Dukungan DP countdown.
+- Dukungan timer sesuai mekanisme yang tersedia.
+
+Aplikasi ELFAN
+
+- Menampilkan perangkat pada Gedung Madinah → Lantai 1 → Lampu Teras.
+- Menyediakan dua kontrol sakelar.
+- Menyediakan kontrol All ON dan All OFF.
+- Menyediakan pengaturan timer.
+- Menampilkan status aktual masing-masing kanal.
+
+Status implementasi backend dan aplikasi belum diverifikasi.
+
+### 8. Kesimpulan
+
+Lampu Teras Gedung Madinah menggunakan BARDI Wallswitch 2 Gang dengan dua kanal kontrol independen. Perangkat memiliki DP switch dan countdown untuk masing-masing kanal serta menyediakan fitur Timer pada aplikasi Smart Life.
+
+Perangkat dapat diintegrasikan ke ELFAN sebagai satu perangkat dengan dua kanal kontrol terpisah tanpa memerlukan IR.

@@ -1,0 +1,342 @@
+ELFAN V2 — REFERENSI PERANGKAT & LOKASI
+Dokumen: Gedung Mekah, Lantai 1 — Ruang Office
+Sumber: Ruang Office Lantai 1 gedung mekah(2).txt
+Status: Referensi yang diberikan pengguna; isi teknis dipertahankan.
+Aturan: Nilai snapshot bukan status real-time. Bagian yang ditandai belum diuji tidak boleh dianggap sebagai kontrak API terverifikasi.
+==============================================================================
+
+# Dokumentasi Perangkat ELFAN – Gedung Makkah
+
+## 1. Lampu Gedung Makkah – Lantai 1, Ruang Office
+
+Online
+
+2 Gang
+
+Tuya Wi-Fi
+
+[Wall Switches and Dimmers](https://images.openai.com/static-rsc-4/39W0akrDn2CC8YuN39fjROt4dJJb6HSnk4-Bom_JFcF-uVItrHuvJh2bnacWMEfhRnDnLjHaggbT6qGqBPQyjjfUnhxB48bsUIDq-vwGwkn7iY3yJ2-PwPxaBXxI9JtKAgw7Ttuqm7GL3-y6RvZkiOssqzeTEcAfR9vnGXm_8H4?purpose=inline)
+
+### A. Identitas Perangkat
+
+| Informasi         | Detail                                 |
+| ----------------- | -------------------------------------- |
+| Nama perangkat    | Lampu Gedung Makkah                    |
+| Lokasi            | Gedung Makkah – Lantai 1, Ruang Office |
+| Merek/Produk      | BARDI Wallswitch 2 Gang - WHT/BLK      |
+| Product Name Tuya | BARDI Wallswitch 2 Gang - WHT/BLK      |
+| Device ID         | `a3ee5390cd39c5b0abq6j0`               |
+| Product Category  | `kg`                                   |
+| Status            | Online                                 |
+| Aktivasi          | 8 Oktober 2026, 10:31:17               |
+| Project           | ELFAN-Smart-Building                   |
+| Association       | `gg-104877865119244591275`             |
+| Data Center       | Singapore Data Center                  |
+| Sub-Device        | No                                     |
+| IP Address        | `157.85.211.243`                       |
+
+### B. Tampilan Smart Life
+
+Perangkat menggunakan sakelar pintar dua gang. Masing-masing gang dapat dikendalikan secara terpisah.
+
+Berdasarkan tampilan Smart Life:
+
+| Gang   | Nama pada Smart Life | Fungsi                       |
+| ------ | -------------------- | ---------------------------- |
+| Gang 1 | Lampu Kantor         | Mengontrol lampu kantor      |
+| Gang 2 | Saklar Lampu Kantor  | Mengontrol jalur lampu kedua |
+
+Nama mengikuti label yang terlihat pada tampilan Smart Life. Pemetaan fisik masing-masing jalur tetap perlu disesuaikan dengan instalasi lampu di lokasi.
+
+### C. Standard Instruction Set
+
+| DP Code            | Tipe    | Fungsi                                                  |
+| ------------------ | ------- | ------------------------------------------------------- |
+| `switch_1`         | Boolean | ON/OFF gang 1                                           |
+| `switch_2`         | Boolean | ON/OFF gang 2                                           |
+| `countdown_1`      | Integer | Timer gang 1, satuan detik                              |
+| `countdown_2`      | Integer | Timer gang 2, satuan detik                              |
+| `relay_status`     | Enum    | Pengaturan kondisi relay saat perangkat menyala kembali |
+| `switch_backlight` | Boolean | Mengatur lampu indikator sakelar                        |
+| `cycle_time`       | String  | Pengaturan waktu siklus                                 |
+| `random_time`      | String  | Pengaturan waktu acak                                   |
+| `switch_inching`   | String  | Pengaturan mode inching                                 |
+
+### D. Standard Status Set
+
+Perangkat menyediakan status yang sama dengan daftar fungsi pada Instruction Set.
+
+| DP Code            | Tipe    | Keterangan                 |
+| ------------------ | ------- | -------------------------- |
+| `switch_1`         | Boolean | Status gang 1              |
+| `switch_2`         | Boolean | Status gang 2              |
+| `countdown_1`      | Integer | Status timer gang 1        |
+| `countdown_2`      | Integer | Status timer gang 2        |
+| `relay_status`     | Enum    | Status konfigurasi relay   |
+| `switch_backlight` | Boolean | Status lampu indikator     |
+| `cycle_time`       | String  | Data pengaturan siklus     |
+| `random_time`      | String  | Data pengaturan waktu acak |
+| `switch_inching`   | String  | Data pengaturan inching    |
+
+### E. Detail Parameter
+
+1\. Sakelar utama
+
+| Parameter  | Nilai            |
+| ---------- | ---------------- |
+| `switch_1` | `true` / `false` |
+| `switch_2` | `true` / `false` |
+
+2\. Timer
+
+| Parameter     | Nilai         |
+| ------------- | ------------- |
+| `countdown_1` | 0–86400 detik |
+| `countdown_2` | 0–86400 detik |
+| Satuan        | Detik         |
+| Nilai awal    | 0             |
+
+3\. Relay Status
+
+Pilihan yang tersedia:
+
+- `power_off`
+- `power_on`
+- `last`
+
+4\. Backlight
+
+- `true`: indikator sakelar aktif.
+- `false`: indikator sakelar tidak aktif.
+
+### F. Rancangan Integrasi ELFAN
+
+Untuk aplikasi ELFAN, perangkat ditampilkan sebagai satu perangkat lampu dengan dua kontrol terpisah.
+
+Lampu Gedung Makkah
+
+Gedung Makkah · Lantai 1 · Ruang Office
+
+Lampu Kantor
+
+Gang 1
+
+Saklar Lampu Kantor
+
+Gang 2
+
+Masing-masing gang memiliki kontrol ON/OFF dan timer sendiri.
+
+Rancangan fungsi aplikasi:
+
+1. ON/OFF Lampu Kantor.
+2. ON/OFF Saklar Lampu Kantor.
+3. Timer untuk masing-masing gang.
+4. Menampilkan status aktual masing-masing gang.
+5. Kontrol kedua gang secara independen.
+
+### G. Mapping DP untuk Backend
+
+```
+{
+  "device_id": "a3ee5390cd39c5b0abq6j0",
+  "device_type": "smart_switch_2gang",
+  "capabilities": {
+    "gang_1": {
+      "name": "Lampu Kantor",
+      "switch_dp": "switch_1",
+      "timer_dp": "countdown_1"
+    },
+    "gang_2": {
+      "name": "Saklar Lampu Kantor",
+      "switch_dp": "switch_2",
+      "timer_dp": "countdown_2"
+    }
+  }
+}
+```
+
+Mapping di atas merupakan rancangan konfigurasi internal ELFAN, bukan payload resmi Tuya.
+
+### H. Catatan Implementasi
+
+- Kedua gang harus diperlakukan sebagai dua kanal kontrol yang berbeda.
+- Perubahan status gang 1 tidak boleh memengaruhi gang 2.
+- Timer masing-masing gang harus berdiri sendiri.
+- `switch_1` dan `switch_2` digunakan untuk mengirim sekaligus membaca status sakelar.
+- Fitur `cycle_time`, `random_time`, dan `switch_inching` belum perlu ditampilkan pada antarmuka utama ELFAN.
+- Nilai status awal pada data perangkat yang diberikan adalah kedua sakelar `false`, kedua timer `0`, dan `switch_backlight` `false`.
+
+Dokumentasi perangkat pertama selesai
+
+Perangkat pertama Gedung Makkah sudah tercatat. Struktur integrasinya menggunakan satu kartu perangkat dengan dua kanal lampu independen.
+
+
+
+# Dokumentasi Perangkat ELFAN – Gedung Makkah
+
+## 2. Lampu Ruang HRD – Lantai 1, Ruang Office
+
+Online
+
+1 Gang
+
+Tuya Wi-Fi
+
+[BARDI Smart Wall Switch EU 1 Gang - White  – BARDI Summarecon](https://images.openai.com/static-rsc-4/O8lw-jsBv0HcPftG9TKIB08nTd1ZupI46Vlaa5iz3L06URtlae3nQ1Y0vWcfkeVBLsm9niyOBnMafJGgDNkaNwlh9jgK0gG3qA9xFkzp67Hh8FuY9z0Ld2-spQ7-yOzKGEW3kBMna0wD9FAntUWeNggmfZjcYBx9opjmkmkbl-k?purpose=inline)
+
+### A. Identitas Perangkat
+
+| Informasi         | Detail                                 |
+| ----------------- | -------------------------------------- |
+| Nama perangkat    | Lampu Ruang HRD                        |
+| Lokasi            | Gedung Makkah – Lantai 1, Ruang Office |
+| Keterangan lokasi | Lampu khusus di atas meja HRD          |
+| Merek/Produk      | BARDI Wallswitch EU 1 Gang             |
+| Product Name Tuya | BARDI Wallswitch EU 1 Gang             |
+| Device ID         | `a3d441f828f9d252a0efeb`               |
+| Product Category  | `kg`                                   |
+| Status            | Online                                 |
+| Aktivasi          | 8 Oktober 2026, 10:33:41               |
+| Project           | ELFAN-Smart-Building                   |
+| Association       | `gg-104877865119244591275`             |
+| Data Center       | Singapore Data Center                  |
+| Sub-Device        | No                                     |
+| IP Address        | `157.85.211.243`                       |
+
+### B. Tampilan Smart Life
+
+Perangkat menggunakan BARDI Wallswitch EU 1 Gang dengan satu kanal sakelar.
+
+| Komponen | Fungsi                                   |
+| -------- | ---------------------------------------- |
+| Switch 1 | Menghidupkan dan mematikan lampu         |
+| Timer    | Mengatur jadwal atau hitung mundur lampu |
+| Setting  | Pengaturan perangkat                     |
+
+### C. Standard Instruction Set
+
+| DP Code            | Tipe    | Fungsi                                                     |
+| ------------------ | ------- | ---------------------------------------------------------- |
+| `switch_1`         | Boolean | ON/OFF lampu                                               |
+| `countdown_1`      | Integer | Timer lampu dalam detik                                    |
+| `relay_status`     | Enum    | Pengaturan kondisi relay setelah perangkat menyala kembali |
+| `switch_backlight` | Boolean | Mengatur lampu indikator sakelar                           |
+| `cycle_time`       | String  | Pengaturan waktu siklus                                    |
+| `random_time`      | String  | Pengaturan waktu acak                                      |
+| `switch_inching`   | String  | Pengaturan mode inching                                    |
+
+### D. Standard Status Set
+
+| DP Code            | Tipe    | Keterangan                 |
+| ------------------ | ------- | -------------------------- |
+| `switch_1`         | Boolean | Status ON/OFF lampu        |
+| `countdown_1`      | Integer | Status timer               |
+| `relay_status`     | Enum    | Status konfigurasi relay   |
+| `switch_backlight` | Boolean | Status lampu indikator     |
+| `cycle_time`       | String  | Data pengaturan siklus     |
+| `random_time`      | String  | Data pengaturan waktu acak |
+| `switch_inching`   | String  | Data pengaturan inching    |
+
+### E. Detail Parameter
+
+1\. Sakelar lampu
+
+| Parameter  | Nilai      |
+| ---------- | ---------- |
+| DP Code    | `switch_1` |
+| Tipe       | Boolean    |
+| ON         | `true`     |
+| OFF        | `false`    |
+| Nilai awal | `false`    |
+
+2\. Timer
+
+| Parameter  | Nilai         |
+| ---------- | ------------- |
+| DP Code    | `countdown_1` |
+| Tipe       | Integer       |
+| Satuan     | Detik         |
+| Minimum    | 0             |
+| Maksimum   | 86400         |
+| Nilai awal | 0             |
+| Step       | 1             |
+
+Timer mendukung rentang hingga 24 jam.
+
+3\. Relay Status
+
+Pilihan konfigurasi:
+
+- `power_off`
+- `power_on`
+- `last`
+
+4\. Backlight
+
+- `true`: indikator sakelar aktif.
+- `false`: indikator sakelar tidak aktif.
+
+### F. Rancangan Integrasi ELFAN
+
+Lampu Ruang HRD
+
+Gedung Makkah · Lantai 1 · Ruang Office
+
+Lampu di atas meja HRD
+
+Gang 1
+
+Kontrol ON/OFF
+
+Tersedia
+
+Timer
+
+Tersedia
+
+Fungsi yang perlu tersedia di aplikasi:
+
+1. Menghidupkan lampu.
+2. Mematikan lampu.
+3. Menampilkan status lampu secara aktual.
+4. Mengatur timer untuk mematikan lampu secara otomatis.
+5. Menampilkan sisa waktu timer jika didukung oleh data status perangkat.
+
+### G. Mapping DP untuk Backend
+
+```
+{
+  "device_id": "a3d441f828f9d252a0efeb",
+  "device_type": "smart_switch_1gang",
+  "capabilities": {
+    "main_light": {
+      "name": "Lampu Ruang HRD",
+      "switch_dp": "switch_1",
+      "timer_dp": "countdown_1"
+    }
+  }
+}
+```
+
+Konfigurasi di atas merupakan rancangan internal ELFAN.
+
+### H. Catatan Implementasi
+
+- Perangkat ini hanya memiliki satu kanal sakelar.
+- Kontrol lampu menggunakan `switch_1`.
+- Timer menggunakan `countdown_1`.
+- Timer harus menjadi fitur tersendiri pada halaman kontrol perangkat.
+- Fitur siklus, waktu acak, dan inching tidak perlu ditampilkan pada antarmuka utama.
+- Status awal yang diberikan: lampu OFF, timer 0, dan backlight OFF.
+
+Dokumentasi perangkat kedua selesai
+
+Rekap Gedung Makkah – Lantai 1, Ruang Office
+
+| No. | Perangkat           | Kanal  | Kontrol                 |
+| --- | ------------------- | ------ | ----------------------- |
+| 1   | Lampu Gedung Makkah | 2 gang | ON/OFF + Timer per gang |
+| 2   | Lampu Ruang HRD     | 1 gang | ON/OFF + Timer          |
+
+Kedua perangkat sudah memiliki mapping DP yang dapat dijadikan acuan implementasi backend ELFAN.

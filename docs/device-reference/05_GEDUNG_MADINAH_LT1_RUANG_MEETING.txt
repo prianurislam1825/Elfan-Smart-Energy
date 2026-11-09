@@ -1,0 +1,1635 @@
+ELFAN V2 — REFERENSI PERANGKAT & LOKASI
+Dokumen: Gedung Madinah, Lantai 1 — Ruang Meeting
+Sumber: Ruang Meeting Lantai 1 gedung madinah(2).txt
+Status: Referensi yang diberikan pengguna; isi teknis dipertahankan.
+Aturan: Nilai snapshot bukan status real-time. Bagian yang ditandai belum diuji tidak boleh dianggap sebagai kontrak API terverifikasi.
+==============================================================================
+
+DOKUMENTASI PERANGKAT ELFAN
+Gedung Madinah – Lantai 1 – Ruang Meeting
+1. Identitas Perangkat
+Parameter	Keterangan
+Nama Perangkat	Lampu Ruang Meeting
+Product Name	BARDI Wallswitch 3 Gang - WHT/BLK
+Device ID	a3b168de699846fb66gkgl
+Product Category	kg
+Device Status	Online
+Activated At	5 Oktober 2026, 15:28:12
+IP Address	157.85.212.225
+Project	ELFAN-Smart-Building
+Association	gg-104877865119244591275
+Data Center	Singapore Data Center
+Sub-Device	No
+
+2. Deskripsi Perangkat
+Lampu Ruang Meeting menggunakan BARDI Wallswitch 3 Gang yang memiliki tiga kanal sakelar untuk mengendalikan tiga jalur lampu secara terpisah.
+
+Berdasarkan tampilan aplikasi Smart Life, nama kanal yang digunakan adalah:
+1. Switch 1
+2. Lampu
+3. Lampu Belakang
+Perangkat terhubung dengan platform Tuya melalui Smart Life dan dapat dikendalikan melalui aplikasi maupun integrasi ELFAN.
+3. Konfigurasi Data Point (DP)
+3.1. Switch Control
+Data Point	Tipe	Fungsi
+switch_1	Boolean	Kontrol sakelar 1
+switch_2	Boolean	Kontrol sakelar 2
+switch_3	Boolean	Kontrol sakelar 3
+
+Nilai:
+- true = ON
+- false = OFF
+3.2. Countdown
+Data Point	Tipe	Rentang	Fungsi
+countdown_1	Integer	0–86.400 detik	Countdown sakelar 1
+countdown_2	Integer	0–86.400 detik	Countdown sakelar 2
+countdown_3	Integer	0–86.400 detik	Countdown sakelar 3
+
+Ketentuan:
+- Satuan menggunakan detik.
+- Minimum 0 detik.
+- Maksimum 86.400 detik atau 24 jam.
+- Setiap kanal memiliki DP countdown tersendiri.
+3.3. DP Tambahan
+Data Point	Tipe	Fungsi
+relay_status	Enum	Pengaturan kondisi relay setelah perangkat menyala
+switch_backlight	Boolean	Kontrol lampu indikator sakelar
+cycle_time	String	Parameter pengaturan siklus
+random_time	String	Parameter pengaturan waktu acak
+switch_inching	String	Parameter pengaturan inching
+
+Nilai relay_status:
+- power_off
+- power_on
+- last
+4. JSON Editor
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "switch_2",
+    "value": false
+  },
+  {
+    "code": "switch_3",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "countdown_2",
+    "value": 0
+  },
+  {
+    "code": "countdown_3",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "switch_backlight",
+    "value": false
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "switch_inching"
+  }
+]
+
+
+5. Fitur Perangkat
+Fitur	Ketersediaan	Keterangan
+ON/OFF Individual	Tersedia	Kontrol tiga kanal secara terpisah
+All ON	Tersedia	Menyalakan seluruh kanal
+All OFF	Tersedia	Mematikan seluruh kanal
+Timer	Tersedia	Terlihat pada aplikasi Smart Life
+Countdown DP	Tersedia pada spesifikasi DP	Countdown tersedia untuk masing-masing kanal
+Relay Status	Tersedia	power_off, power_on, last
+Backlight	Tersedia	Kontrol indikator sakelar
+
+6. Pemetaan Fungsi ELFAN
+Fungsi ELFAN	Data Point	Keterangan
+Lampu Ruang Meeting – Switch 1	switch_1	Kontrol ON/OFF
+Lampu Ruang Meeting – Lampu	switch_2	Kontrol ON/OFF
+Lampu Ruang Meeting – Lampu Belakang	switch_3	Kontrol ON/OFF
+Countdown Switch 1	countdown_1	Hitung mundur
+Countdown Lampu	countdown_2	Hitung mundur
+Countdown Lampu Belakang	countdown_3	Hitung mundur
+Timer	Timer	Mengikuti dukungan mekanisme perangkat
+
+7. Rencana Integrasi ELFAN
+Backend Raspberry Pi
+- Registrasi perangkat pada Device Registry.
+- Integrasi menggunakan Tuya Adapter.
+- Pemetaan tiga kanal sakelar.
+- Kontrol ON/OFF individual.
+- Kontrol All ON dan All OFF.
+- Pembacaan status aktual perangkat.
+- Dukungan DP countdown.
+- Dukungan timer sesuai mekanisme yang tersedia.
+Aplikasi ELFAN
+- Menampilkan perangkat pada Gedung Madinah → Lantai 1 → Ruang Meeting.
+- Menyediakan tiga kontrol sakelar sesuai nama kanal.
+- Menyediakan kontrol All ON dan All OFF.
+- Menyediakan pengaturan timer.
+- Menampilkan status aktual masing-masing kanal.
+Status implementasi backend dan aplikasi belum diverifikasi.
+8. Kesimpulan
+Lampu Ruang Meeting menggunakan BARDI Wallswitch 3 Gang dengan tiga kanal kontrol independen. Perangkat menyediakan DP switch dan countdown untuk setiap kanal, serta fitur Timer melalui aplikasi Smart Life.
+
+Perangkat dapat diintegrasikan ke ELFAN sebagai satu perangkat dengan tiga kanal kontrol terpisah tanpa memerlukan IR.
+
+
+
+# DOKUMENTASI PERANGKAT ELFAN
+
+## Gedung Madinah – Perangkat Running Text - ruang meeting - lantai 1
+
+### 1. Identitas Perangkat
+
+| Parameter        | Keterangan                 |
+| ---------------- | -------------------------- |
+| Nama Perangkat   | Smart Plug Running Text    |
+| Product Name     | Smart plug                 |
+| Device ID        | `a3115a64261c0dce24g5kj`   |
+| Product Category | `tdq`                      |
+| Device Status    | Online                     |
+| Activated At     | 24 Oktober 2026, 10:06:22  |
+| IP Address       | `157.85.211.151`           |
+| Project          | ELFAN-Smart-Building       |
+| Association      | `gg-104877865119244591275` |
+| Data Center      | Singapore Data Center      |
+| Sub-Device       | No                         |
+
+### 2. Deskripsi Perangkat
+
+Smart Plug digunakan sebagai sumber kontrol daya untuk perangkat Running Text di Gedung Madinah.
+
+Perangkat terhubung melalui platform Tuya dan aplikasi Smart Life. Selain fungsi ON/OFF, Smart Plug dilengkapi fitur pemantauan konsumsi listrik (electricity monitoring) dan pengaturan Timer.
+
+Dengan kemampuan tersebut, ELFAN dapat dikembangkan untuk mengendalikan daya Running Text sekaligus memantau penggunaan listriknya.
+
+### 3. Konfigurasi Data Point (DP)
+
+#### 3.1. Switch Control
+
+| Data Point | Tipe    | Fungsi                    |
+| ---------- | ------- | ------------------------- |
+| `switch_1` | Boolean | Kontrol ON/OFF Smart Plug |
+
+Nilai:
+
+- `true` = ON
+- `false` = OFF
+
+#### 3.2. Countdown
+
+| Data Point    | Tipe    | Rentang        | Fungsi               |
+| ------------- | ------- | -------------- | -------------------- |
+| `countdown_1` | Integer | 0–86.400 detik | Countdown Smart Plug |
+
+Ketentuan:
+
+- Satuan menggunakan detik.
+- Minimum 0 detik.
+- Maksimum 86.400 detik atau 24 jam.
+
+#### 3.3. Electricity Monitoring
+
+| Data Point    | Tipe    | Satuan | Fungsi                        |
+| ------------- | ------- | ------ | ----------------------------- |
+| `add_ele`     | Integer | kWh    | Total konsumsi energi listrik |
+| `cur_current` | Integer | mA     | Arus listrik saat ini         |
+| `cur_power`   | Integer | W      | Daya listrik saat ini         |
+| `cur_voltage` | Integer | V      | Tegangan listrik saat ini     |
+
+Parameter berdasarkan spesifikasi DP:
+
+| Data Point    | Rentang      | Scale |
+| ------------- | ------------ | ----- |
+| `add_ele`     | 0–50.000 kWh | 3     |
+| `cur_current` | 0–30.000 mA  | 0     |
+| `cur_power`   | 0–50.000 W   | 1     |
+| `cur_voltage` | 0–5.000 V    | 1     |
+
+#### 3.4. DP Tambahan
+
+| Data Point       | Tipe    | Fungsi                                             |
+| ---------------- | ------- | -------------------------------------------------- |
+| `relay_status`   | Enum    | Pengaturan kondisi relay setelah perangkat menyala |
+| `random_time`    | String  | Parameter pengaturan waktu acak                    |
+| `cycle_time`     | String  | Parameter pengaturan siklus                        |
+| `switch_inching` | String  | Parameter pengaturan inching                       |
+| `test_bit`       | Integer | Parameter tambahan perangkat                       |
+| `fault`          | Bitmap  | Informasi kondisi gangguan perangkat               |
+
+Nilai `relay_status` berdasarkan spesifikasi:
+
+- `0`
+- `1`
+- `2`
+
+Arti masing-masing nilai belum dipastikan berdasarkan informasi perangkat yang tersedia.
+
+### 4. JSON Editor
+
+```
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "switch_inching"
+  }
+]
+```
+
+### 5. Fitur Perangkat
+
+| Fitur                  | Ketersediaan                 | Keterangan                                   |
+| ---------------------- | ---------------------------- | -------------------------------------------- |
+| ON/OFF                 | Tersedia                     | Mengendalikan daya Running Text              |
+| Timer                  | Tersedia                     | Pengaturan waktu melalui aplikasi Smart Life |
+| Countdown              | Tersedia pada spesifikasi DP | Hitung mundur hingga 24 jam                  |
+| Electricity Monitoring | Tersedia                     | Pemantauan konsumsi listrik                  |
+| Current Monitoring     | Tersedia                     | Pemantauan arus listrik                      |
+| Power Monitoring       | Tersedia                     | Pemantauan daya listrik                      |
+| Voltage Monitoring     | Tersedia                     | Pemantauan tegangan listrik                  |
+| Relay Status           | Tersedia                     | Pengaturan kondisi relay                     |
+| Random Time            | Tersedia pada spesifikasi DP | Parameter pengaturan waktu acak              |
+| Cycle Time             | Tersedia pada spesifikasi DP | Parameter pengaturan siklus                  |
+
+#### 5.1. Contoh Data Electricity Monitoring
+
+Berdasarkan tampilan aplikasi Smart Life yang dikirimkan:
+
+| Parameter         | Nilai    |
+| ----------------- | -------- |
+| Konsumsi Hari Ini | 0,00 kWh |
+| Arus Saat Ini     | 0 mA     |
+| Daya Saat Ini     | 0 W      |
+| Tegangan          | 221,6 V  |
+| Total Konsumsi    | 0,20 kWh |
+
+Nilai merupakan hasil pembacaan pada tangkapan layar, bukan data real-time saat ini.
+
+### 6. Pemetaan Fungsi ELFAN
+
+| Fungsi ELFAN           | Data Point    | Keterangan                       |
+| ---------------------- | ------------- | -------------------------------- |
+| Running Text Power     | `switch_1`    | Kontrol ON/OFF                   |
+| Countdown Running Text | `countdown_1` | Pengaturan hitung mundur         |
+| Timer Running Text     | Timer         | Pengaturan jadwal/waktu          |
+| Monitoring Arus        | `cur_current` | Menampilkan arus listrik         |
+| Monitoring Daya        | `cur_power`   | Menampilkan daya listrik         |
+| Monitoring Tegangan    | `cur_voltage` | Menampilkan tegangan listrik     |
+| Konsumsi Energi        | `add_ele`     | Menampilkan total energi listrik |
+| Status Gangguan        | `fault`       | Informasi gangguan perangkat     |
+
+### 7. Rencana Integrasi ELFAN
+
+Backend Raspberry Pi
+
+- Registrasi Smart Plug pada Device Registry.
+- Integrasi menggunakan Tuya Adapter.
+- Kontrol ON/OFF Running Text.
+- Pembacaan status aktual perangkat.
+- Dukungan Countdown dan Timer.
+- Pengambilan data Electricity Monitoring.
+- Menyediakan data arus, daya, tegangan, dan konsumsi energi.
+- Membaca informasi gangguan melalui DP `fault`.
+
+Aplikasi ELFAN
+
+- Menampilkan perangkat pada Gedung Madinah → Running Text.
+- Menyediakan tombol ON/OFF.
+- Menyediakan pengaturan Timer dan Countdown.
+- Menampilkan status perangkat.
+- Menampilkan konsumsi energi listrik.
+- Menampilkan arus, daya, dan tegangan secara terpisah.
+
+Status implementasi backend dan aplikasi belum diverifikasi.
+
+### 8. Kesimpulan
+
+Smart Plug Running Text merupakan perangkat kontrol daya berbasis Tuya yang memiliki satu kanal ON/OFF, Countdown, Timer, serta fitur Electricity Monitoring.
+
+Keunggulan perangkat ini adalah kemampuannya untuk tidak hanya mengendalikan daya Running Text, tetapi juga menyediakan data konsumsi energi listrik.
+
+Perangkat dapat diintegrasikan ke ELFAN sebagai Smart Plug dengan fungsi Power Control dan Electricity Monitoring, tanpa memerlukan IR.
+
+
+
+# DOKUMENTASI PERANGKAT ELFAN
+
+## IoT Smart Figura – Smart Plug
+
+### 1. Identitas Perangkat
+
+| Parameter        | Keterangan                 |
+| ---------------- | -------------------------- |
+| Nama Perangkat   | Smart Plug – Smart Figura  |
+| Product Name     | Smart plug                 |
+| Device ID        | `a3fe84ca594c1670eefycl`   |
+| Product Category | `cz`                       |
+| Device Status    | Online                     |
+| Activated At     | 24 Oktober 2026, 10:09:36  |
+| IP Address       | `157.85.211.151`           |
+| Project          | ELFAN-Smart-Building       |
+| Association      | `gg-104877865119244591275` |
+| Data Center      | Singapore Data Center      |
+| Sub-Device       | No                         |
+
+### 2. Deskripsi Perangkat
+
+Smart Plug digunakan sebagai pengendali daya listrik pada perangkat yang terhubung dengan IoT Smart Figura.
+
+Perangkat menggunakan Smart Plug berbasis Tuya yang terintegrasi dengan aplikasi Smart Life. Pengendalian dapat dilakukan melalui aplikasi maupun integrasi ELFAN.
+
+Perangkat menyediakan kontrol ON/OFF, Timer, pemantauan konsumsi listrik, serta beberapa konfigurasi tambahan.
+
+### 3. Konfigurasi Data Point (DP)
+
+#### 3.1. Switch Control
+
+| Data Point | Tipe    | Fungsi                  |
+| ---------- | ------- | ----------------------- |
+| `switch_1` | Boolean | Kontrol daya Smart Plug |
+
+Nilai:
+
+- `true` = ON
+- `false` = OFF
+
+#### 3.2. Countdown
+
+| Data Point    | Tipe    | Rentang        | Fungsi              |
+| ------------- | ------- | -------------- | ------------------- |
+| `countdown_1` | Integer | 0–86.400 detik | Countdown perangkat |
+
+Ketentuan:
+
+- Satuan menggunakan detik.
+- Minimum 0 detik.
+- Maksimum 86.400 detik atau 24 jam.
+
+#### 3.3. Pemantauan Konsumsi Listrik
+
+| Data Point    | Tipe    | Satuan | Fungsi                              |
+| ------------- | ------- | ------ | ----------------------------------- |
+| `add_ele`     | Integer | kWh    | Total energi listrik yang digunakan |
+| `cur_current` | Integer | mA     | Arus listrik saat ini               |
+| `cur_power`   | Integer | W      | Daya listrik saat ini               |
+| `cur_voltage` | Integer | V      | Tegangan listrik saat ini           |
+
+#### 3.4. DP Tambahan
+
+| Data Point          | Tipe    | Fungsi                                             |
+| ------------------- | ------- | -------------------------------------------------- |
+| `relay_status`      | Enum    | Pengaturan kondisi relay setelah perangkat menyala |
+| `light_mode`        | Enum    | Pengaturan mode indikator                          |
+| `child_lock`        | Boolean | Penguncian kontrol perangkat                       |
+| `cycle_time`        | String  | Parameter pengaturan siklus waktu                  |
+| `random_time`       | String  | Parameter pengaturan waktu acak                    |
+| `switch_inching`    | String  | Parameter pengaturan inching                       |
+| `overcharge_switch` | Boolean | Pengaturan proteksi kelebihan daya                 |
+
+Nilai `relay_status`:
+
+- `power_off`
+- `power_on`
+- `last`
+
+Nilai `light_mode`:
+
+- `relay`
+- `pos`
+- `none`
+
+### 4. JSON Editor
+
+```
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "light_mode"
+  },
+  {
+    "code": "child_lock",
+    "value": false
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "switch_inching"
+  },
+  {
+    "code": "overcharge_switch",
+    "value": false
+  }
+]
+```
+
+### 5. Fitur Perangkat
+
+| Fitur                  | Ketersediaan | Keterangan                                         |
+| ---------------------- | ------------ | -------------------------------------------------- |
+| ON/OFF                 | Tersedia     | Menghidupkan dan mematikan Smart Plug              |
+| Timer                  | Tersedia     | Pengaturan jadwal operasional melalui Smart Life   |
+| Countdown              | Tersedia     | Hitung mundur hingga 24 jam                        |
+| Electricity Monitoring | Tersedia     | Pemantauan konsumsi energi listrik                 |
+| Current Monitoring     | Tersedia     | Pemantauan arus listrik                            |
+| Power Monitoring       | Tersedia     | Pemantauan daya listrik                            |
+| Voltage Monitoring     | Tersedia     | Pemantauan tegangan listrik                        |
+| Relay Status           | Tersedia     | Pengaturan kondisi relay setelah perangkat menyala |
+| Child Lock             | Tersedia     | Mengunci kontrol perangkat                         |
+| Overcharge Protection  | Tersedia     | Pengaturan proteksi kelebihan daya                 |
+| Light Mode             | Tersedia     | Pengaturan mode indikator perangkat                |
+
+### 6. Pemetaan Fungsi ELFAN
+
+| Fungsi ELFAN           | Data Point          | Keterangan                         |
+| ---------------------- | ------------------- | ---------------------------------- |
+| Smart Figura Power     | `switch_1`          | Kontrol ON/OFF Smart Figura        |
+| Countdown Smart Figura | `countdown_1`       | Pengaturan hitung mundur           |
+| Timer Smart Figura     | Timer               | Pengaturan jadwal operasional      |
+| Konsumsi Energi        | `add_ele`           | Total penggunaan energi            |
+| Arus Listrik           | `cur_current`       | Monitoring arus                    |
+| Daya Listrik           | `cur_power`         | Monitoring daya                    |
+| Tegangan Listrik       | `cur_voltage`       | Monitoring tegangan                |
+| Status Relay           | `relay_status`      | Pengaturan kondisi relay           |
+| Child Lock             | `child_lock`        | Penguncian kontrol perangkat       |
+| Proteksi Daya          | `overcharge_switch` | Pengaturan proteksi kelebihan daya |
+
+### 7. Rencana Integrasi ELFAN
+
+Backend Raspberry Pi
+
+- Registrasi perangkat pada Device Registry.
+- Integrasi menggunakan Tuya Adapter.
+- Pemetaan kontrol ON/OFF.
+- Pembacaan status perangkat.
+- Implementasi fitur Timer dan Countdown.
+- Pengambilan data konsumsi energi listrik.
+- Pengambilan data arus, daya, dan tegangan.
+- Dukungan konfigurasi relay dan proteksi perangkat.
+
+Aplikasi ELFAN
+
+- Menampilkan perangkat pada menu IoT Smart Figura.
+- Menyediakan kontrol ON/OFF.
+- Menyediakan pengaturan Timer dan Countdown.
+- Menampilkan status perangkat secara aktual.
+- Menampilkan informasi konsumsi energi listrik.
+- Menampilkan data arus, daya, dan tegangan.
+
+Status implementasi backend dan aplikasi belum diverifikasi.
+
+### 8. Kesimpulan
+
+Smart Plug pada IoT Smart Figura menggunakan perangkat berbasis Tuya dengan satu kanal kontrol daya. Perangkat mendukung ON/OFF, Timer, Countdown, serta pemantauan konsumsi energi listrik melalui parameter arus, daya, tegangan, dan total energi.
+
+Perangkat dapat diintegrasikan ke ELFAN sebagai pengendali daya Smart Figura sekaligus sumber data monitoring kelistrikan.
+
+
+
+Dokumentasi Perangkat ELFAN – Lampu Warna BARDI 12W RGBWW (Online)
+
+Online
+ RGBWW Smart Lighting
+
+1. Informasi Perangkat
+Parameter	Detail
+Nama Perangkat	Lampu Warna
+Lokasi	Belum ditentukan
+Jenis Perangkat	Smart Bulb RGBWW
+Merek	BARDI
+Model	BARDI 12W RGBWW Bulb
+Device ID	a3605033d5d970c23axmuf
+Product ID	Tidak tersedia
+Product Category	dj
+Status	Online
+Tanggal Aktivasi	5 Oktober 2026, 15:32:49
+Platform	Tuya IoT Platform
+Project	ELFAN-Smart-Building
+Association	gg-104877865119244591275
+Data Center	Singapore
+IP Address	157.85.212.225
+Sub-Device	No
+
+2. Konfigurasi Kanal
+Perangkat menggunakan satu kanal lampu dengan dukungan pengaturan pencahayaan RGBWW.
+Kanal	Fungsi	DP Code
+Kanal 1	Power ON/OFF	switch_led
+Kanal 1	Mode pencahayaan	work_mode
+Kanal 1	Kecerahan	bright_value_v2
+Kanal 1	Temperatur warna	temp_value_v2
+Kanal 1	Pengaturan warna	colour_data_v2
+Kanal 1	Efek pencahayaan	scene_data_v2
+Kanal 1	Timer	countdown_1
+
+3. Fitur yang Tersedia
+Fitur	Keterangan
+Power Control	Menyalakan dan mematikan lampu
+White Mode	Mengatur pencahayaan putih
+Colour Mode	Mengatur warna RGB
+Scene Mode	Memilih efek atau suasana pencahayaan
+Music Sync	Sinkronisasi pencahayaan dengan musik
+Brightness Control	Mengatur tingkat kecerahan
+Color Temperature	Mengatur temperatur cahaya
+Timer	Mengatur hitung mundur lampu
+Power Memory	Pengaturan perilaku daya setelah listrik kembali
+Do Not Disturb	Pengaturan mode jangan ganggu
+
+Mode pencahayaan yang tersedia:
+1. white – Pencahayaan putih.
+2. colour – Pengaturan warna RGB.
+3. scene – Efek dan preset pencahayaan.
+4. music – Sinkronisasi pencahayaan dengan musik.
+4. Tuya Data Point (DP)
+A. Instruction Set
+DP Code	Tipe	Rentang / Nilai	Fungsi
+switch_led	Boolean	true / false	Power ON/OFF
+work_mode	Enum	white, colour, scene, music	Mode pencahayaan
+bright_value_v2	Integer	10–1000	Kecerahan
+temp_value_v2	Integer	0–1000	Temperatur warna
+colour_data_v2	JSON	H: 0–360, S/V: 0–1000	Pengaturan warna
+scene_data_v2	JSON	Scene 1–8	Pengaturan scene
+countdown_1	Integer	0–86400 detik	Timer
+music_data	JSON	Parameter musik	Music Sync
+control_data	JSON	Parameter kontrol	Pengaturan pencahayaan
+power_memory	Raw	Tidak ditentukan	Pengaturan memori daya
+do_not_disturb	Boolean	true / false	Mode jangan ganggu
+
+B. Standard Status Set
+DP Code	Tipe	Fungsi
+switch_led	Boolean	Status ON/OFF
+work_mode	Enum	Mode pencahayaan aktif
+bright_value_v2	Integer	Nilai kecerahan
+temp_value_v2	Integer	Nilai temperatur warna
+colour_data_v2	JSON	Data warna aktif
+scene_data_v2	JSON	Data scene aktif
+countdown_1	Integer	Status timer
+music_data	JSON	Data mode musik
+control_data	JSON	Data kontrol pencahayaan
+power_memory	Raw	Status konfigurasi memori daya
+do_not_disturb	Boolean	Status mode jangan ganggu
+
+C. Status Perangkat Saat Pengecekan
+[
+  {
+    "code": "switch_led",
+    "value": false
+  },
+  {
+    "code": "work_mode"
+  },
+  {
+    "code": "bright_value_v2",
+    "value": 10
+  },
+  {
+    "code": "temp_value_v2",
+    "value": 0
+  },
+  {
+    "code": "colour_data_v2",
+    "value": {}
+  },
+  {
+    "code": "scene_data_v2",
+    "value": {}
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "music_data",
+    "value": {}
+  },
+  {
+    "code": "control_data",
+    "value": {}
+  },
+  {
+    "code": "power_memory"
+  },
+  {
+    "code": "do_not_disturb",
+    "value": false
+  }
+]
+
+
+Catatan: Status di atas merupakan data saat perangkat diperiksa. DP tanpa field value belum memberikan nilai aktual pada data yang dikirimkan.
+5. Catatan Integrasi ELFAN
+Perangkat akan diintegrasikan melalui Tuya Cloud API menggunakan Device ID dan DP Code yang tersedia.
+
+Rencana kemampuan integrasi:
+Modul ELFAN	Perintah
+Power Controller	ON / OFF
+Lighting Controller	Mengatur kecerahan
+Color Controller	Mengatur warna RGB
+Temperature Controller	Mengatur temperatur cahaya
+Scene Controller	Memilih scene pencahayaan
+Music Controller	Mengatur mode Music Sync
+Timer Controller	Mengatur hitung mundur
+
+Contoh perintah suara ELFAN:
+- "Elfan, nyalakan lampu warna."
+- "Ubah warna lampu menjadi biru."
+- "Atur kecerahan lampu menjadi 50 persen."
+- "Ubah lampu ke mode putih."
+- "Aktifkan mode Night."
+- "Matikan lampu dalam 30 menit."
+Catatan teknis integrasi:
+- Nilai brightness menggunakan rentang 10–1000.
+- Nilai temperatur warna menggunakan rentang 0–1000.
+- Data warna menggunakan format HSV (h, s, v).
+- Scene menggunakan struktur JSON bertingkat scene_num dan scene_units.
+- Music Sync memerlukan format payload khusus pada music_data.
+- Timer menggunakan satuan detik dengan batas maksimal 86.400 detik.
+- Struktur payload untuk scene_data_v2, music_data, dan control_data perlu diuji sebelum implementasi produksi.
+6. Status Dokumentasi
+Komponen	Status
+Identifikasi perangkat	Selesai
+Device ID dan kategori	Selesai
+Pemetaan DP	Selesai
+Identifikasi fitur	Selesai
+Pemetaan kanal	Selesai
+Pengujian Tuya Cloud API	Belum diuji
+Integrasi backend ELFAN	Belum dikerjakan
+Integrasi aplikasi Android	Belum dikerjakan
+
+Kesimpulan: BARDI 12W RGBWW Bulb telah teridentifikasi dan dipetakan sebagai perangkat RGBWW Smart Lighting pada proyek ELFAN-Smart-Building. Seluruh DP utama telah terdokumentasi untuk menjadi acuan integrasi backend dan aplikasi ELFAN.
+
+
+
+Dokumentasi Produk ELFAN – Smart Plug AC Ruang Meeting
+
+Online
+ Tuya IoT
+
+1. Identitas Perangkat
+Parameter	Detail
+Nama Perangkat	Smart Plug AC Ruang Meeting
+Produk	Smart Plug
+Device ID	a3b6e1623ca12cf8acv7ul
+Product Category	cz
+Status	Online
+Waktu Aktivasi	20 Oktober 2026, 13:49:05
+Platform	Tuya IoT Platform
+Project	ELFAN-Smart-Building
+Association	gg-104877865119244591275
+Data Center	Singapore
+IP Address	157.85.211.151
+Sub-Device	No
+
+2. Deskripsi Perangkat
+Smart Plug AC Ruang Meeting merupakan perangkat pengendali suplai listrik untuk unit AC yang berada di ruang meeting.
+
+Perangkat ini digunakan bersama dengan IR Controller yang mengendalikan fungsi AC melalui sinyal inframerah.
+
+Keduanya memiliki fungsi berbeda:
+- IR Controller: Mengendalikan AC melalui perintah inframerah, seperti ON/OFF, suhu, mode operasi, dan kecepatan kipas.
+- Smart Plug: Memutus atau menyambungkan suplai listrik AC secara langsung.
+Smart Plug berfungsi sebagai pemutus daya utama ketika AC perlu dimatikan sepenuhnya. Dengan demikian, meskipun AC masih dapat menerima perintah dari remote atau IR Controller, suplai listriknya dapat diputus melalui Smart Plug.
+3. Konfigurasi Datapoint (DP)
+Perangkat menggunakan kategori cz dengan datapoint yang sama seperti Smart Plug lain yang telah didokumentasikan.
+3.1 Datapoint Kontrol
+DP Code	Tipe	Rentang / Nilai	Fungsi
+switch_1	Boolean	true, false	Menghidupkan atau mematikan suplai listrik
+countdown_1	Integer	0–86.400 detik	Pengaturan hitung mundur untuk perangkat
+relay_status	Enum	power_off, power_on, last	Mengatur kondisi relay setelah perangkat mendapatkan daya
+light_mode	Enum	relay, pos, none	Pengaturan indikator lampu perangkat
+child_lock	Boolean	true, false	Mengaktifkan atau menonaktifkan kunci perangkat
+cycle_time	String	'-	Pengaturan jadwal siklus
+random_time	String	'-	Pengaturan waktu acak
+switch_inching	String	'-	Pengaturan mode inching
+overcharge_switch	Boolean	true, false	Pengaturan perlindungan overcharge
+
+3.2 Datapoint Monitoring
+DP Code	Tipe	Rentang	Fungsi
+add_ele	Integer	0–50.000 kWh	Total konsumsi energi listrik
+cur_current	Integer	0–80.000 mA	Arus listrik saat ini
+cur_power	Integer	0–200.000 W	Daya listrik saat ini
+cur_voltage	Integer	0–5.000 V	Tegangan listrik saat ini
+
+Catatan: Nilai skala DP mengikuti konfigurasi Tuya. add_ele menggunakan scale 3, sedangkan cur_power dan cur_voltage menggunakan scale 1.
+4. JSON Editor
+Berikut struktur datapoint yang tersedia pada perangkat:
+[
+  {
+    "code": "switch_1",
+    "value": false
+  },
+  {
+    "code": "countdown_1",
+    "value": 0
+  },
+  {
+    "code": "relay_status"
+  },
+  {
+    "code": "light_mode"
+  },
+  {
+    "code": "child_lock",
+    "value": false
+  },
+  {
+    "code": "cycle_time"
+  },
+  {
+    "code": "random_time"
+  },
+  {
+    "code": "switch_inching"
+  },
+  {
+    "code": "overcharge_switch",
+    "value": false
+  }
+]
+
+
+Contoh perintah kontrol ON/OFF:
+
+Menghidupkan Smart Plug
+{
+  "commands": [
+    {
+      "code": "switch_1",
+      "value": true
+    }
+  ]
+}
+
+
+Mematikan Smart Plug
+{
+  "commands": [
+    {
+      "code": "switch_1",
+      "value": false
+    }
+  ]
+}
+
+
+5. Fitur Perangkat
+Fitur	Ketersediaan	Keterangan
+Power ON/OFF	Tersedia	Kontrol suplai listrik AC
+Timer	Tersedia	Pengaturan waktu perangkat
+Countdown	Tersedia	Hitung mundur 0–86.400 detik
+Electricity Monitoring	Tersedia	Monitoring energi, arus, daya, dan tegangan
+Relay Status	Tersedia	Pengaturan kondisi relay
+Child Lock	Tersedia	Penguncian kontrol perangkat
+Cycle Time	Tersedia	Pengaturan siklus waktu
+Random Time	Tersedia	Pengaturan waktu acak
+Inching	Tersedia	Pengaturan pemutusan otomatis
+Overcharge Protection	Tersedia	Pengaturan perlindungan overcharge
+
+6. Pemetaan Fungsi ELFAN
+Perangkat akan didaftarkan sebagai pengendali daya AC ruang meeting.
+Fungsi ELFAN	Datapoint	Keterangan
+Hidupkan AC (suplai daya)	switch_1 = true	Menyambungkan listrik ke AC
+Matikan AC total	switch_1 = false	Memutus suplai listrik AC
+Atur countdown	countdown_1	Menentukan durasi hitung mundur
+Baca konsumsi energi	add_ele	Mengambil total energi
+Baca arus	cur_current	Mengambil arus listrik
+Baca daya	cur_power	Mengambil daya listrik
+Baca tegangan	cur_voltage	Mengambil tegangan listrik
+
+Contoh perintah suara:
+- "Elfan, matikan listrik AC ruang meeting."
+- "Elfan, nyalakan suplai AC ruang meeting."
+- "Elfan, cek konsumsi listrik AC ruang meeting."
+7. Rencana Integrasi ELFAN
+Smart Plug akan diintegrasikan sebagai perangkat terpisah dari IR Controller, tetapi keduanya dikelompokkan dalam satu entitas AC ruang meeting.
+
+Struktur kontrol yang direncanakan:
+AC RUANG MEETING
+│
+├── IR Controller
+│   ├── Power ON/OFF
+│   ├── Temperature
+│   ├── Mode
+│   ├── Fan Speed
+│   └── Swing
+│
+└── Smart Plug
+    ├── Power ON/OFF
+    ├── Countdown
+    └── Electricity Monitoring
+
+
+Alur pengendalian:
+1. IR Controller digunakan untuk mengoperasikan fungsi AC sehari-hari.
+2. Smart Plug digunakan untuk memutus atau menyambungkan suplai listrik secara langsung.
+3. Ketika Smart Plug OFF, AC kehilangan suplai listrik sehingga tidak dapat dikendalikan melalui remote maupun IR Controller.
+4. Ketika Smart Plug ON, suplai listrik kembali tersedia dan AC dapat dikendalikan melalui IR Controller.
+Catatan operasional: Pemutusan daya AC secara langsung sebaiknya dilakukan setelah AC dimatikan melalui IR Controller dan kompresor berhenti, untuk menghindari pemutusan listrik mendadak saat AC sedang beroperasi.
+8. Kesimpulan
+Smart Plug AC Ruang Meeting merupakan perangkat pendukung pengendalian AC pada sistem ELFAN. Perangkat ini menyediakan kontrol suplai listrik secara langsung, fitur timer/countdown, serta monitoring konsumsi energi.
+
+Integrasi dengan IR Controller memungkinkan ELFAN mengendalikan fungsi operasional AC sekaligus menyediakan mekanisme pemutusan daya secara menyeluruh.
+
+Status dokumentasi: Datapoint dan fitur perangkat telah teridentifikasi berdasarkan Tuya Developer. Implementasi backend ELFAN dan pengujian kontrol aktual belum diverifikasi.
+
+
+DOKUMENTASI PERANGKAT ELFAN
+BARDI AC – IR Controller
+Status: Online
+Kategori: Infrared Air Conditioner (qt)
+Lokasi: Ruang Meeting
+Project: ELFAN-Smart-Building
+1. Identitas Perangkat
+Parameter	Keterangan
+Nama Perangkat	AC
+Product Name	红外空调
+Device ID	a3bed287d614f264edjl6y
+Product Category	qt
+Status	Online
+Activated At	6 Oktober 2026, 11:14:30
+Project	ELFAN-Smart-Building
+Association	gg-104877865119244591275
+Data Center	Singapore Data Center
+Sub-Device	Ya
+IP Address	Tidak tersedia (--)
+
+2. Deskripsi Perangkat
+Perangkat ini merupakan IR Controller yang digunakan untuk mengendalikan AC melalui sinyal inframerah (IR).
+
+IR Controller terhubung dengan ekosistem Tuya dan memungkinkan ELFAN mengatur fungsi AC tanpa harus menggunakan remote fisik.
+
+Berdasarkan tampilan Smart Life, perangkat menyediakan kontrol berikut:
+- Menghidupkan dan mematikan AC.
+- Mengatur suhu.
+- Mengatur mode AC.
+- Mengatur kecepatan kipas atau volume udara.
+- Mengakses pengaturan tambahan melalui menu More.
+Hubungan dengan Smart Plug AC Ruang Meeting
+
+AC Ruang Meeting menggunakan dua perangkat kontrol yang memiliki fungsi berbeda:
+Perangkat	Fungsi
+Smart Plug AC	Memutus atau menyambungkan suplai listrik AC secara langsung.
+IR Controller AC	Mengirim perintah untuk mengatur fungsi operasional AC.
+
+Keduanya mengendalikan satu unit AC yang sama.
+
+IR Controller digunakan untuk pengaturan operasional AC, sedangkan Smart Plug berfungsi sebagai pemutus daya utama ketika AC perlu dimatikan sepenuhnya.
+3. Konfigurasi Data Point (DP)
+3.1 Instruction Set
+Kode DP	Tipe	Rentang / Nilai	Fungsi
+F	ENUM	0–3	Parameter kontrol dengan empat kemungkinan nilai.
+M	ENUM	0–4	Parameter kontrol dengan lima kemungkinan nilai.
+PowerOff	STRING	PowerOff	Perintah mematikan AC.
+PowerOn	STRING	PowerOn	Perintah menghidupkan AC.
+T	ENUM	16–30	Pengaturan suhu AC dalam °C.
+
+3.2 Status Set
+Kode DP	Tipe	Rentang / Nilai	Fungsi
+wind	ENUM	0–3	Status kecepatan kipas.
+mode	ENUM	0–4	Status mode operasional AC.
+power	BOOLEAN	true, false	Status hidup atau mati AC.
+temp	ENUM	16–30	Suhu AC dalam °C.
+
+Catatan pemetaan: Rentang nilai F dan M sesuai dengan jumlah pilihan pada status wind dan mode. Keduanya merupakan kandidat pasangan parameter kontrol dan status. Namun, urutan nilai masing-masing pilihan belum dapat dipastikan dari informasi yang tersedia.
+4. JSON Editor
+Data yang tersedia pada JSON Editor:
+[
+  {
+    "code": "F"
+  },
+  {
+    "code": "M"
+  },
+  {
+    "code": "PowerOff"
+  },
+  {
+    "code": "PowerOn"
+  },
+  {
+    "code": "T"
+  }
+]
+
+
+Contoh struktur perintah kontrol:
+{
+  "commands": [
+    {
+      "code": "PowerOn",
+      "value": "PowerOn"
+    },
+    {
+      "code": "T",
+      "value": 24
+    }
+  ]
+}
+
+
+Contoh tersebut menggambarkan struktur perintah menghidupkan AC dan mengatur suhu ke 24°C. Implementasi aktual tetap perlu disesuaikan dengan mekanisme pengiriman perintah IR pada layanan Tuya.
+5. Fitur Perangkat
+Berdasarkan tampilan Smart Life dan data DP yang tersedia:
+Fitur	Ketersediaan	Keterangan
+Power On	Tersedia	Menghidupkan AC melalui IR.
+Power Off	Tersedia	Mematikan AC melalui IR.
+Temperature	Tersedia	Pengaturan suhu 16–30°C.
+Mode	Tersedia	Pengaturan mode operasional AC.
+Air Volume	Tersedia	Pengaturan kecepatan kipas.
+More	Tersedia	Menu pengaturan tambahan pada Smart Life.
+
+
+
+
+
+
+
+
+smart-switch.cz
+
+
+Ilustrasi antarmuka kontrol AC. Tampilan aktual mengikuti perangkat Smart Life yang digunakan.
+6. Pemetaan Fungsi ELFAN
+Rencana pemetaan kontrol pada ELFAN:
+Fungsi ELFAN	Data Point	Parameter
+Menghidupkan AC	PowerOn	Perintah ON
+Mematikan AC	PowerOff	Perintah OFF
+Mengatur suhu	T	16–30°C
+Mengatur kecepatan kipas	F	0–3
+Mengatur mode AC	M	0–4
+Membaca status daya	power	Boolean
+Membaca suhu	temp	16–30
+Membaca kecepatan kipas	wind	0–3
+Membaca mode AC	mode	0–4
+
+7. Rencana Integrasi ELFAN
+7.1 Backend Raspberry Pi
+Backend ELFAN akan menangani:
+- Autentikasi dan komunikasi dengan Tuya Cloud.
+- Pengiriman perintah IR ke AC.
+- Pengaturan suhu, mode, dan kecepatan kipas.
+- Pembacaan status perangkat jika tersedia melalui API.
+- Pengelolaan hubungan antara IR Controller dan Smart Plug AC.
+7.2 Aplikasi ELFAN
+Antarmuka kontrol AC direncanakan menyediakan:
+- Tombol Power.
+- Pengaturan suhu.
+- Pemilihan mode AC.
+- Pengaturan kecepatan kipas.
+- Status operasional AC.
+7.3 Integrasi IR Controller dan Smart Plug
+Alur kontrol yang direncanakan:
+          ELFAN
+             |
+       Backend Raspberry Pi
+             |
+       AC Controller
+          /     \
+         /       \
+   IR Controller  Smart Plug
+         |           |
+         |           |
+     Kontrol AC   Suplai Listrik
+         \           /
+          \         /
+           SATU UNIT AC
+
+
+Skenario operasional:
+1. Pengguna menghidupkan AC melalui ELFAN.
+2. Smart Plug memastikan suplai listrik tersambung.
+3. IR Controller mengirim perintah Power On.
+4. Pengguna dapat mengatur suhu, mode, dan kecepatan kipas.
+5. Ketika pengguna meminta AC dimatikan sepenuhnya, IR Controller mengirim Power Off terlebih dahulu, kemudian Smart Plug memutus suplai listrik.
+Ketika suplai listrik diputus, IR Controller tidak dapat mengirim perintah ke AC sampai suplai listrik kembali tersambung.
+8. Kesimpulan
+IR Controller AC merupakan perangkat pengendali operasional AC melalui inframerah. Perangkat menyediakan fungsi Power, Temperature, Mode, dan Air Volume.
+
+Dalam ekosistem ELFAN, perangkat ini akan dipasangkan dengan Smart Plug AC Ruang Meeting. IR Controller menangani pengaturan AC, sedangkan Smart Plug menangani pemutusan suplai listrik secara langsung.
+
+Dokumentasi dasar selesai
+ Pemetaan nilai ENUM perlu validasi
+
+Catatan pengembangan: Nilai ENUM untuk F dan M masih perlu diuji agar ELFAN dapat menerjemahkan angka menjadi pilihan mode dan kecepatan kipas yang benar. Selain itu, status AC dari IR merupakan status yang dilaporkan sistem, sehingga belum tentu selalu mencerminkan kondisi fisik AC apabila AC dioperasikan menggunakan remote lain.
+
+
+
+Perlu. Dokumentasi IR Controller tetap dibuat terpisah dari dokumentasi AC. Keduanya merupakan dua perangkat berbeda dalam ekosistem Tuya, meskipun saling terhubung.
+
+Konsepnya seperti ini:
+
+- IR Controller adalah perangkat fisik utama yang memancarkan sinyal inframerah.
+- AC adalah perangkat virtual yang ditambahkan melalui IR Controller di aplikasi Smart Life.
+- Setelah AC ditambahkan, Smart Life menyediakan antarmuka khusus untuk mengendalikan AC, seperti Power, suhu, mode, dan kecepatan kipas.
+
+Jadi, dokumentasi sebelumnya membahas profil AC yang dikendalikan melalui IR. Sekarang kita dokumentasikan perangkat IR fisiknya.
+
+# DOKUMENTASI PERANGKAT ELFAN
+
+## Universal IR Remote Controller
+
+### 1. Identitas Perangkat
+
+| Parameter        | Keterangan                 |
+| ---------------- | -------------------------- |
+| Product Name     | 万能红外遥控器                    |
+| Device ID        | `173782525002916cb404`     |
+| Product Category | `wnykq`                    |
+| Status           | Online                     |
+| Activated At     | 6 Oktober 2026, 11:14:30   |
+| Project          | ELFAN-Smart-Building       |
+| Association      | `gg-104877865119244591275` |
+| Data Center      | Singapore Data Center      |
+| Sub-Device       | No                         |
+| IP Address       | `157.85.212.225`           |
+
+### 2. Deskripsi Perangkat
+
+Universal IR Remote Controller merupakan perangkat pengendali inframerah universal yang digunakan untuk mengontrol perangkat elektronik melalui sinyal IR.
+
+Perangkat ini dapat digunakan untuk mengendalikan berbagai perangkat elektronik yang kompatibel, seperti AC, televisi, dan perangkat lain yang menggunakan remote inframerah.
+
+Pengguna perlu menambahkan atau melakukan pairing perangkat yang ingin dikendalikan melalui IR Controller menggunakan aplikasi Smart Life.
+
+### 3. Konfigurasi Data Point (DP)
+
+| Kode DP    | Tipe   | Nilai      | Keterangan                  |
+| ---------- | ------ | ---------- | --------------------------- |
+| `F`        | ENUM   | 0–3        | Parameter kontrol perangkat |
+| `M`        | ENUM   | 0–4        | Parameter kontrol perangkat |
+| `PowerOff` | STRING | `PowerOff` | Perintah Power Off          |
+| `PowerOn`  | STRING | `PowerOn`  | Perintah Power On           |
+| `T`        | ENUM   | 16–30      | Parameter suhu              |
+
+### 4. JSON Editor
+
+```
+[
+  {
+    "code": "F"
+  },
+  {
+    "code": "M"
+  },
+  {
+    "code": "PowerOff"
+  },
+  {
+    "code": "PowerOn"
+  },
+  {
+    "code": "T"
+  }
+]
+```
+
+Catatan: Data Point tersebut merupakan informasi yang ditampilkan pada JSON Editor IR Controller. Parameter dan fungsi operasional AC mengikuti profil perangkat AC yang ditambahkan melalui IR Controller.
+
+### 5. Hubungan IR Controller dengan Perangkat AC
+
+Dalam project ELFAN, IR Controller digunakan sebagai perangkat induk untuk mengendalikan AC Ruang Meeting.
+
+Perangkat fisik
+
+Universal IR Remote Controller
+
+Category: wnykq
+
+ID: 173782525002916cb404
+
+Pairing / Add Device melalui Smart Life
+
+Perangkat virtual / Sub-device
+
+AC Ruang Meeting
+
+Category: qt
+
+ID: a3bed287d614f264edjl6y
+
+### 6. Integrasi dengan ELFAN
+
+Alur integrasi yang direncanakan:
+
+1. ELFAN mengenali IR Controller sebagai perangkat utama.
+2. Backend mengakses perangkat melalui Tuya Cloud.
+3. Perangkat AC yang telah dipasangkan menjadi target pengendalian.
+4. ELFAN mengirim perintah sesuai fungsi AC melalui integrasi IR.
+5. Status dan parameter AC dikelola berdasarkan Data Point yang tersedia.
+
+### 7. Kesimpulan
+
+IR Controller merupakan perangkat utama untuk mengirimkan sinyal inframerah. Sementara itu, AC yang ditambahkan melalui IR Controller merupakan profil perangkat virtual dengan fungsi pengendalian khusus.
+
+Struktur dokumentasi ELFAN untuk AC Ruang Meeting:
+
+| No. | Dokumentasi                      | Peran                                 |
+| --- | -------------------------------- | ------------------------------------- |
+| 1   | Smart Plug AC Ruang Meeting      | Pemutus dan penyambung suplai listrik |
+| 2   | Universal IR Remote Controller   | Perangkat fisik pengirim sinyal IR    |
+| 3   | AC Ruang Meeting (IR Sub-device) | Profil kontrol AC                     |
+
+Dengan pemisahan ini, backend ELFAN nantinya dapat membedakan perangkat fisik IR, perangkat virtual AC, dan Smart Plug yang mengendalikan suplai listrik AC.
+
+
+# Dokumentasi Perangkat – TV Infrared (IR)
+
+## 1. Identitas Perangkat
+
+| Parameter | Informasi |
+|---|---|
+| Nama Perangkat | 红外电视 (IR Television) |
+| Device ID | `a3ce2bf18c13facafcoixu` |
+| Product Category | `qt` |
+| Status | Online |
+| Waktu Aktivasi | 6 Oktober 2026, 11:15:35 |
+| Proyek | ELFAN-Smart-Building |
+| Association | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-Device | Ya |
+| IP Address | Tidak tersedia |
+
+## 2. Deskripsi Perangkat
+
+TV Infrared merupakan perangkat virtual yang dikonfigurasi melalui Universal IR Remote. Perangkat ini memungkinkan ELFAN mengendalikan televisi menggunakan perintah infrared yang diteruskan oleh perangkat IR Remote.
+
+Antarmuka Smart Life menyediakan kontrol seperti:
+- Power On/Off.
+- Home dan Menu.
+- Navigasi arah (atas, bawah, kiri, kanan).
+- OK dan Back.
+- Pengaturan volume.
+- Penggantian channel.
+- Input angka dan nomor channel.
+
+## 3. Struktur Perintah (Standard Instruction Set)
+
+Perangkat memiliki 25 kode perintah yang dapat digunakan untuk mengendalikan televisi.
+
+| Kode | Tipe | Keterangan |
+|---|---|---|
+| `Power` | String | Tombol daya TV |
+| `Home` | String | Membuka halaman utama |
+| `Menu` | String | Membuka menu TV |
+| `Up` | String | Navigasi ke atas |
+| `Down` | String | Navigasi ke bawah |
+| `Left` | String | Navigasi ke kiri |
+| `Right` | String | Navigasi ke kanan |
+| `OK` | String | Konfirmasi pilihan |
+| `Back` | String | Kembali ke halaman sebelumnya |
+| `Volume+` | String | Menaikkan volume |
+| `Volume-` | String | Menurunkan volume |
+| `Channel+` | String | Berpindah ke channel berikutnya |
+| `Channel-` | String | Berpindah ke channel sebelumnya |
+| `0`–`9` | String | Input angka |
+| `-/--` | String | Tombol pemilihan format input angka |
+| `C` | Enum | Parameter integer, rentang 1–999 |
+
+**Catatan parameter `C`:**
+- Tipe data: Integer.
+- Nilai minimum: 1.
+- Nilai maksimum: 999.
+- Step: 1.
+
+## 4. Standard Status Set
+
+Tidak tersedia data status (*No data found*).
+
+Dengan demikian, perangkat ini menyediakan perintah kontrol, tetapi tidak menyediakan daftar status perangkat melalui Standard Status Set pada informasi yang diberikan.
+
+## 5. Antarmuka Smart Life
+
+Kontrol TV pada aplikasi Smart Life terdiri atas:
+
+| Kelompok Kontrol | Fungsi |
+|---|---|
+| Power | Menghidupkan atau mematikan TV |
+| Home | Membuka halaman utama |
+| Menu | Membuka menu |
+| Navigasi | Atas, bawah, kiri, kanan |
+| OK | Konfirmasi pilihan |
+| Back | Kembali |
+| Channel | Channel naik/turun |
+| Volume | Volume naik/turun |
+| Numeric | Tombol angka 0–9 |
+| More | Kontrol tambahan |
+
+## 6. Integrasi dengan ELFAN
+
+Perangkat TV IR dapat diintegrasikan melalui Tuya Cloud API dengan memanfaatkan kode perintah yang tersedia.
+
+Contoh pemetaan perintah:
+
+| Perintah ELFAN | Kode Tuya |
+|---|---|
+| Nyalakan TV | `Power` |
+| Buka menu TV | `Menu` |
+| Buka halaman utama | `Home` |
+| Naikkan volume | `Volume+` |
+| Turunkan volume | `Volume-` |
+| Pindah channel | `Channel+` / `Channel-` |
+| Pilih menu | `OK` |
+| Kembali | `Back` |
+
+Alur komunikasi:
+
+**ELFAN → Tuya Cloud API → Universal IR Remote → TV**
+
+Perangkat TV IR bertindak sebagai profil kontrol, sedangkan Universal IR Remote bertugas meneruskan sinyal infrared ke televisi.
+
+## 7. Catatan Integrasi
+
+1. Perangkat TV merupakan sub-device dari Universal IR Remote.
+2. Perintah dikirim berdasarkan kode yang tersedia pada Instruction Set.
+3. Standard Status Set tidak menyediakan data status perangkat.
+4. Keberhasilan perintah perlu divalidasi melalui respons perangkat atau pengujian langsung pada televisi.
+5. Pemetaan kode perintah harus dipertahankan sesuai kode asli Tuya agar kompatibel dengan integrasi ELFAN.
+
+
+
+
+# DOKUMENTASI PERANGKAT ELFAN
+# KIPAS RUANG MEETING – LANTAI 1 GEDUNG MADINAH
+
+**Proyek:** ELFAN-Smart-Building
+**Kategori:** Smart Home – Infrared Control
+**Lokasi:** Ruang Meeting, Lantai 1, Gedung Madinah
+**Platform Integrasi:** Tuya IoT Platform / Smart Life
+**Jenis Perangkat:** DIY Infrared Fan
+
+---
+
+## 1. Deskripsi Perangkat
+
+Kipas Ruang Meeting merupakan perangkat kipas angin DIY yang dikendalikan menggunakan Universal IR Remote melalui ekosistem Tuya.
+
+Pengendalian kipas menggunakan sinyal infrared yang telah dilatih (IR Learning) dari remote kipas asli.
+
+Dalam aplikasi Smart Life, terdapat dua profil perangkat IR dengan fungsi yang sama-sama berkaitan dengan kipas. Namun, untuk aplikasi ELFAN, kedua profil tersebut harus digabungkan menjadi **satu perangkat logis**.
+
+Penggabungan dilakukan pada lapisan aplikasi ELFAN, bukan dengan mengubah atau menggabungkan perangkat di Tuya.
+
+### Konsep utama
+
+- Satu perangkat kipas pada dashboard ELFAN.
+- Dua profil IR sebagai sumber perintah.
+- Kontrol ON dan OFF dipisahkan menjadi dua aksi.
+- Speed dan Swing tersedia sebagai kontrol tersendiri.
+- Aksi Hidupkan Kipas menjalankan rangkaian Power ON, Speed, dan Swing.
+- Aksi Matikan Kipas hanya menjalankan Power OFF.
+
+## 2. Informasi Perangkat
+
+### 2.1 Profil IR Utama – Operasional Kipas
+
+| Parameter | Informasi |
+|---|---|
+| Product Name | 红外风扇 |
+| Device ID | `a3a8b3c92366d8cccdlv8x` |
+| Product Category | `qt` |
+| Status | Online |
+| Activated At | 6 Oktober 2026, 14:39:20 |
+| Project | ELFAN-Smart-Building |
+| Association | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-Device | Yes |
+| IP Address | Tidak tersedia |
+
+**Fungsi profil:**
+- Menghidupkan kipas.
+- Mengatur kecepatan kipas.
+- Mengaktifkan atau mengubah Swing.
+- Menyediakan perintah tambahan sesuai Instruction Set.
+
+### 2.2 Profil IR Kedua – Matikan Kipas
+
+| Parameter | Informasi |
+|---|---|
+| Product Name | 红外风扇 |
+| Device ID | `a3d520419883fac0c9rthm` |
+| Product Category | `qt` |
+| Status | Online |
+| Activated At | 6 Oktober 2026, 14:40:12 |
+| Project | ELFAN-Smart-Building |
+| Association | `gg-104877865119244591275` |
+| Data Center | Singapore Data Center |
+| Sub-Device | Yes |
+| IP Address | Tidak tersedia |
+
+**Fungsi profil:**
+- Menyediakan perintah khusus untuk mematikan kipas.
+- Digunakan sebagai sumber perintah Power OFF pada ELFAN.
+
+Kedua profil memiliki Standard Instruction Set yang sama. Pemisahan fungsi merupakan konfigurasi logika aplikasi berdasarkan hasil pelatihan IR.
+
+## 3. Standard Instruction Set
+
+Kedua profil memiliki enam kode perintah berikut.
+
+| Code | Type | Fungsi |
+|---|---|---|
+| `NegativeIon` | STRING | Kontrol fitur ion negatif |
+| `PowerOff` | STRING | Perintah mematikan kipas |
+| `PowerOn` | STRING | Perintah menghidupkan kipas |
+| `Speed` | STRING | Mengatur kecepatan kipas |
+| `Swing` | STRING | Mengatur ayunan kipas |
+| `Timing` | STRING | Kontrol timer kipas |
+
+Seluruh kode menggunakan tipe data STRING dengan nilai sesuai nama kodenya.
+
+## 4. Standard Status Set
+
+**Status: Not Data Found**
+
+Tidak tersedia Standard Status Set pada kedua profil IR.
+
+Implikasi:
+- Tidak ada data status kipas yang dapat dijadikan sumber konfirmasi langsung melalui Standard Status Set.
+- Aplikasi tidak dapat mengandalkan status aktual kipas dari daftar status tersebut.
+- Status ON/OFF yang ditampilkan ELFAN harus dikelola secara internal.
+- Status internal harus dibedakan dari status fisik perangkat.
+
+## 5. Rancangan Antarmuka ELFAN
+
+### 5.1 Prinsip Antarmuka
+
+Berbeda dengan Smart Life yang menampilkan dua profil IR secara terpisah, ELFAN harus menampilkan satu perangkat kipas.
+
+**Nama perangkat:** Kipas Ruang Meeting
+
+**Lokasi:** Lantai 1, Gedung Madinah.
+
+Kontrol utama yang tersedia:
+
+1. Hidupkan Kipas.
+2. Matikan Kipas.
+3. Kecepatan.
+4. Swing.
+
+Kontrol tambahan dapat dikembangkan kemudian sesuai kebutuhan.
+
+### 5.2 Struktur Menu
+
+| Menu | Fungsi |
+|---|---|
+| Hidupkan Kipas | Menjalankan rangkaian PowerOn, Speed, dan Swing |
+| Matikan Kipas | Menjalankan PowerOff |
+| Kecepatan | Mengirim perintah Speed |
+| Swing | Mengirim perintah Swing |
+
+Menu ON dan OFF harus terpisah di dalam satu halaman perangkat, bukan dibuat menjadi dua perangkat berbeda.
+
+## 6. Logika Pengendalian ELFAN
+
+### 6.1 Skenario Hidupkan Kipas
+
+Ketika pengguna memilih perintah Hidupkan Kipas, ELFAN menjalankan tiga perintah secara berurutan.
+
+| Urutan | Perintah | Profil IR |
+|---|---|---|
+| 1 | `PowerOn` | Profil IR Utama |
+| 2 | `Speed` | Profil IR Utama |
+| 3 | `Swing` | Profil IR Utama |
+
+Alur:
+
+`Hidupkan Kipas → PowerOn → Speed → Swing`
+
+Catatan:
+- Perintah harus dijalankan secara berurutan.
+- Jeda antarperintah harus dapat dikonfigurasi setelah pengujian IR.
+- Nilai kecepatan awal dan kondisi Swing perlu ditentukan pada tahap konfigurasi.
+- Jangan mengirim perintah secara paralel karena berpotensi mengganggu urutan penerimaan sinyal IR.
+
+### 6.2 Skenario Matikan Kipas
+
+Ketika pengguna memilih Matikan Kipas, ELFAN hanya menjalankan satu perintah.
+
+| Urutan | Perintah | Profil IR |
+|---|---|---|
+| 1 | `PowerOff` | Profil IR Kedua |
+
+Alur:
+
+`Matikan Kipas → PowerOff`
+
+Tidak perlu menjalankan perintah Speed atau Swing.
+
+### 6.3 Pengaturan Kecepatan
+
+Pengguna dapat mengakses kontrol kecepatan secara terpisah.
+
+Perintah:
+
+`Speed`
+
+Sumber perintah: Profil IR Utama.
+
+Catatan: Jumlah tingkat kecepatan dan perilaku setiap pengiriman perintah belum ditentukan dalam data perangkat. Hal tersebut perlu disesuaikan dengan hasil pelatihan dan pengujian remote asli.
+
+### 6.4 Pengaturan Swing
+
+Pengguna dapat mengaktifkan atau mengubah ayunan kipas melalui kontrol tersendiri.
+
+Perintah:
+
+`Swing`
+
+Sumber perintah: Profil IR Utama.
+
+Catatan: Perilaku tombol Swing perlu diuji untuk mengetahui apakah setiap pengiriman perintah mengaktifkan, menonaktifkan, atau mengganti mode ayunan.
+
+## 7. Arsitektur Integrasi
+
+ELFAN harus memisahkan identitas perangkat logis dengan identitas profil IR Tuya.
+
+Alur komunikasi:
+
+`ELFAN Mobile → ELFAN Backend → Device Controller → Tuya Cloud API → Universal IR Remote → Kipas`
+
+Struktur logis:
+
+- Satu perangkat logis: `fan_meeting_room`.
+- Profil IR utama: `a3a8b3c92366d8cccdlv8x`.
+- Profil IR OFF: `a3d520419883fac0c9rthm`.
+
+Kedua profil harus terhubung pada satu konfigurasi perangkat logis agar aplikasi tidak menampilkan dua kipas.
+
+## 8. Rekomendasi Struktur Data Backend
+
+Contoh struktur konfigurasi perangkat:
+
+```json
+{
+  "device_key": "fan_meeting_room",
+  "device_name": "Kipas Ruang Meeting",
+  "device_type": "fan",
+  "location": {
+    "building": "Gedung Madinah",
+    "floor": 1,
+    "room": "Ruang Meeting"
+  },
+  "integration": "tuya_ir",
+  "profiles": {
+    "main": {
+      "device_id": "a3a8b3c92366d8cccdlv8x",
+      "purpose": "fan_operation"
+    },
+    "power_off": {
+      "device_id": "a3d520419883fac0c9rthm",
+      "purpose": "fan_power_off"
+    }
+  },
+  "commands": {
+    "turn_on": [
+      {
+        "profile": "main",
+        "code": "PowerOn"
+      },
+      {
+        "profile": "main",
+        "code": "Speed"
+      },
+      {
+        "profile": "main",
+        "code": "Swing"
+      }
+    ],
+    "turn_off": [
+      {
+        "profile": "power_off",
+        "code": "PowerOff"
+      }
+    ],
+    "speed": {
+      "profile": "main",
+      "code": "Speed"
+    },
+    "swing": {
+      "profile": "main",
+      "code": "Swing"
+    }
+  }
+}
+```
+
+Struktur tersebut merupakan konfigurasi logis untuk backend ELFAN. Implementasi pengiriman perintah tetap harus mengikuti endpoint, format payload, dan autentikasi Tuya Cloud API yang digunakan.
+
+## 9. Pengelolaan Status Perangkat
+
+Karena tidak tersedia Standard Status Set, backend perlu memiliki status internal.
+
+Contoh status:
+
+| Status | Keterangan |
+|---|---|
+| `unknown` | Status kipas belum diketahui |
+| `on` | Perintah ON berhasil dikirim |
+| `off` | Perintah OFF berhasil dikirim |
+| `processing` | Rangkaian perintah sedang berjalan |
+| `error` | Pengiriman perintah mengalami kegagalan |
+
+Ketentuan:
+1. Status awal setelah aplikasi atau backend aktif adalah `unknown`, kecuali terdapat status tersimpan yang masih valid.
+2. Status berubah menjadi `processing` saat rangkaian perintah dijalankan.
+3. Status internal diperbarui setelah pengiriman perintah berhasil.
+4. Jika pengiriman gagal, tampilkan status `error`.
+5. Jangan menganggap respons sukses API sebagai bukti kipas benar-benar menyala atau mati.
+6. Jika kipas dikendalikan melalui remote fisik, status internal ELFAN dapat berbeda dari kondisi sebenarnya.
+
+## 10. Ketentuan Keamanan dan Keandalan
+
+- Hindari menjalankan dua rangkaian perintah kipas secara bersamaan.
+- Gunakan antrean perintah atau mekanisme locking.
+- Berikan jeda yang dapat dikonfigurasi antarperintah IR.
+- Hindari pengiriman ulang otomatis untuk perintah toggle tanpa mengetahui kondisi kipas.
+- Sediakan penanganan kegagalan pengiriman perintah.
+- Catat riwayat perintah untuk kebutuhan debugging.
+- Jangan menyimpan kredensial Tuya langsung di konfigurasi perangkat.
+
+## 11. Skenario Pengujian
+
+| No. | Pengujian | Hasil yang Diharapkan |
+|---|---|---|
+| 1 | Hidupkan kipas dari ELFAN | Kipas menerima PowerOn, Speed, Swing secara berurutan |
+| 2 | Matikan kipas dari ELFAN | Kipas menerima PowerOff |
+| 3 | Atur kecepatan | Perintah Speed diterima |
+| 4 | Aktifkan Swing | Perintah Swing diterima |
+| 5 | Pengiriman perintah gagal | ELFAN menampilkan status error |
+| 6 | Perintah dijalankan berulang | Tidak terjadi tumpang tindih proses |
+| 7 | Kipas dikendalikan dari remote fisik | Status internal tidak dianggap sebagai status aktual |
+| 8 | Backend dimulai ulang | Status perangkat tidak langsung diasumsikan ON atau OFF |
+
+## 12. Batasan dan Pengembangan Lanjutan
+
+Fitur berikut belum dapat dianggap tersedia sebelum dilakukan pengujian:
+
+- Penentuan tingkat kecepatan kipas.
+- Pengaturan mode Swing.
+- Penggunaan NegativeIon.
+- Pengaturan Timing.
+- Konfirmasi kondisi aktual kipas.
+- Sinkronisasi kondisi kipas setelah dikendalikan melalui remote fisik.
+
+Fitur tambahan dapat dikembangkan tanpa mengubah konsep satu perangkat logis.
+
+---
+
+## 13. Kesimpulan
+
+Kipas Ruang Meeting menggunakan dua profil IR Tuya yang digabungkan menjadi satu perangkat logis di ELFAN.
+
+Rancangan final:
+
+- **Satu perangkat:** Kipas Ruang Meeting.
+- **Dua profil IR:** Profil operasional dan profil Power OFF.
+- **Satu tampilan kontrol:** Semua fungsi kipas berada dalam satu halaman.
+- **Empat kontrol utama:** Hidupkan, Matikan, Kecepatan, dan Swing.
+- **Skenario ON:** PowerOn → Speed → Swing.
+- **Skenario OFF:** PowerOff.
+
+Dokumentasi ini menjadi acuan untuk pengembangan database perangkat, backend Device Controller, integrasi Tuya Cloud API, dan antarmuka ELFAN Mobile.

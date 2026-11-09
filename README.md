@@ -1,30 +1,41 @@
-# ELFAN Mobile V2
+# ELFAN V2 — Freebuff Implementation Kit
 
-Dokumentasi baseline produk dan pengembangan ELFAN Mobile V2.
+Paket ini ditujukan untuk ditempatkan pada root repository Flutter:
 
-ELFAN adalah platform Smart Building Management yang pertama kali diterapkan di Alwustho, tetapi dirancang agar dapat digunakan organisasi lain dan pengguna perseorangan.
+`D:\Alwustho\Elfan Mobile\elfan_mobile`
 
-## Isi
-- `AI_RULES.md`: aturan wajib coding agent.
-- `docs/01_PRODUCT_REQUIREMENTS.md`: kebutuhan dan ruang lingkup produk.
-- `docs/02_SYSTEM_ARCHITECTURE.md`: arsitektur aplikasi dan integrasi.
-- `docs/03_USER_ROLES_AND_ACCESS.md`: peran dan akses.
-- `docs/04_FEATURE_SPECIFICATION.md`: spesifikasi modul.
-- `docs/05_UI_UX_GUIDELINES.md`: pedoman antarmuka.
-- `docs/06_API_DOCUMENTATION.md`: audit dan kontrak API.
-- `docs/07_DATABASE_AND_DATA_MODELS.md`: konsep data.
-- `docs/08_SYSTEM_FLOW.md`: alur sistem.
-- `docs/09_DEVELOPMENT_ROADMAP.md`: tahapan pengembangan.
-- `docs/10_TESTING_GUIDELINES.md`: standar pengujian.
-- `CHANGELOG.md`: riwayat dokumentasi.
+## Penempatan
 
-## Lingkungan yang diketahui
-- Flutter 3.35.4 stable, Dart 3.9.2.
-- Proyek: `D:\Alwustho\Elfan Mobile\elfan_mobile`.
-- FastAPI pada Raspberry Pi `192.168.20.137:8000`.
-- Swagger: `http://192.168.20.137:8000/docs`.
-- Backend source: `~/cv-engine`.
-- Tuya adapter dan DeviceController telah ada.
-- MediaMTX WebRTC telah digunakan untuk CCTV.
+Ekstrak isi ZIP sehingga struktur berikut berada di root repository:
 
-IP di atas adalah alamat LAN development, bukan alamat produksi. Endpoint, payload, autentikasi, dan schema harus diverifikasi dari backend aktual.
+```text
+elfan_mobile/
+├── AI_RULES.md
+├── AI_IMPLEMENTATION_PROMPT.md
+└── docs/
+    └── device-reference/
+        ├── 01_GEDUNG_MADINAH_LT2_RUANG_KELAS.txt
+        ├── 02_GEDUNG_MADINAH_LT2_KAMAR_SANTRI.txt
+        ├── 03_GEDUNG_MEKAH_LT2_ALWUSTHO_OFFICE.txt
+        ├── 04_GEDUNG_MEKAH_LT1_RUANG_OFFICE.txt
+        ├── 05_GEDUNG_MADINAH_LT1_RUANG_MEETING.txt
+        ├── 06_GEDUNG_MADINAH_LT1_AULA.txt
+        └── 07_GEDUNG_MADINAH_LT3.txt
+```
+
+Jika `AI_RULES.md` atau folder `docs/device-reference` sudah ada, jangan menimpa pekerjaan yang lebih baru tanpa membandingkan isinya terlebih dahulu.
+
+## Cara menjalankan Freebuff
+
+1. Buka Freebuff pada root repository `elfan_mobile`.
+2. Pastikan agent memiliki akses baca/tulis ke repository.
+3. Buka `AI_IMPLEMENTATION_PROMPT.md`.
+4. Salin seluruh isi prompt tersebut ke Freebuff.
+5. Izinkan agent memeriksa dan mengubah file proyek sesuai ruang lingkup dan aturan.
+6. Periksa ringkasan perubahan dan hasil pengujian sebelum menerima perubahan.
+
+## Prinsip dokumentasi
+
+Tujuh TXT ditata ulang secara ringan: nama file diseragamkan, metadata sumber ditambahkan, dan line ending/whitespace dinormalisasi. Isi teknis sumber dipertahankan; tidak ada nilai DP, Device ID, rentang, atau payload yang sengaja direka atau dikoreksi.
+
+Dokumentasi perangkat adalah referensi kemampuan perangkat, bukan bukti bahwa seluruh fitur sudah tersedia pada backend. Freebuff wajib memverifikasi kontrak API dari source backend/OpenAPI aktual sebelum menghubungkan UI.
