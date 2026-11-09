@@ -40,22 +40,22 @@ class DeviceControlState {
     DeviceCommand? pendingCommand,
     Map<String, dynamic>? lastResult,
     Object? error,
-    bool clearLastError = false,
+    bool clearError = false,
     bool clearPending = false,
   }) {
     return DeviceControlState(
       isControlling: isControlling ?? this.isControlling,
-      pendingCommand: clearPending ? null : (pendingCommand ?? this.pendingCommand),
-      lastResult: clearLastError ? null : (lastResult ?? this.lastResult),
-      error: error ?? this.error,
+      pendingCommand: clearPending
+          ? null
+          : (pendingCommand ?? this.pendingCommand),
+      lastResult: lastResult ?? this.lastResult,
+      error: clearError ? null : (error ?? this.error),
     );
   }
 }
 
 /// Notifier untuk kontrol perangkat.
 class DeviceControlNotifier extends Notifier<DeviceControlState> {
-  DeviceControlNotifier();
-
   @override
   DeviceControlState build() {
     return const DeviceControlState();
@@ -64,19 +64,19 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
   /// Kirim perintah ON ke perangkat.
   Future<void> turnOn(Device device) async {
     if (device.isMultiChannel) {
-      await _sendCommand(device.id, {'switch_all': true});
-    } else {
-      await _sendCommand(device.id, {'switch_1': true});
+      await turnAllOn(device);
+      return;
     }
+    await _sendCommand(device.id, _singleChannelCommand(device, true));
   }
 
   /// Kirim perintah OFF ke perangkat.
   Future<void> turnOff(Device device) async {
     if (device.isMultiChannel) {
-      await _sendCommand(device.id, {'switch_all': false});
-    } else {
-      await _sendCommand(device.id, {'switch_1': false});
+      await turnAllOff(device);
+      return;
     }
+    await _sendCommand(device.id, _singleChannelCommand(device, false));
   }
 
   /// Kirim perintah ke channel spesifik (multi-channel).
@@ -90,23 +90,21 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
       state = state.copyWith(error: 'Kanal tidak ditemukan');
       return;
     }
-    final cmd = <String, dynamic>{channel.switchDp: value};
-    await _sendCommand(device.id, cmd);
+    await _sendCommand(device.id, <String, dynamic>{
+      channel.switchDp: value,
+    }, channelIndex: channelIndex);
   }
 
   /// Kirim semua ON untuk multi-channel.
   Future<void> turnAllOn(Device device) async {
     if (!device.isMultiChannel) {
-      await _sendCommand(device.id, {'switch_1': true});
+      await _sendCommand(device.id, _singleChannelCommand(device, true));
       return;
     }
 
     final commands = <String, dynamic>{};
-    if (device.channels != null) {
-      for (var i = 0; i < device.channels!.length; i++) {
-        final channel = device.channels![i];
-        commands[channel.switchDp] = true;
-      }
+    for (final channel in device.channels!) {
+      commands[channel.switchDp] = true;
     }
     await _sendCommand(device.id, commands);
   }
@@ -114,57 +112,50 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
   /// Kirim semua OFF untuk multi-channel.
   Future<void> turnAllOff(Device device) async {
     if (!device.isMultiChannel) {
-      await _sendCommand(device.id, {'switch_1': false});
+      await _sendCommand(device.id, _singleChannelCommand(device, false));
       return;
     }
 
     final commands = <String, dynamic>{};
-    if (device.channels != null) {
-      for (var i = 0; i < device.channels!.length; i++) {
-        final channel = device.channels![i];
-        commands[channel.switchDp] = false;
-      }
+    for (final channel in device.channels!) {
+      commands[channel.switchDp] = false;
     }
     await _sendCommand(device.id, commands);
-  }
-
-  /// Kirim perintah ke perangkat.
-  Future<void> _sendCommand(
-    String logicalId,
-    Map<String, dynamic> command,
-  ) async {
-    state = state.copyWith(
-      isControlling: true,
-      clearLastError: true,
-    );
-
-    try {
-      final repository = ref.read(deviceRepositoryProvider);
-      final result = await repository.sendCommand(
-        logicalId,
-        command,
-      );
-      state = state.copyWith(
-        isControlling: false,
-        lastResult: result,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isControlling: false,
-        error: e,
-      );
-      rethrow;
-    }
   }
 
   /// Kirim perintah custom.
   Future<void> sendCustomCommand(
     String logicalId,
-    Map<String, dynamic> command,
-  ) async {
+    Map<String, dynamic> command, {
+    int? channelIndex,
+  }) async {
+    await _sendCommand(logicalId, command, channelIndex: channelIndex);
+  }
+
+  /// Gunakan `switch_dp` dari channel jika backend menyediakannya.
+  Map<String, dynamic> _singleChannelCommand(Device device, bool value) {
+    final List<DeviceChannel>? channels = device.channels;
+    final String dp = channels != null && channels.isNotEmpty
+        ? channels.first.switchDp
+        : 'switch_1';
+    return <String, dynamic>{dp: value};
+  }
+
+  /// Kirim perintah ke perangkat.
+  Future<void> _sendCommand(
+    String logicalId,
+    Map<String, dynamic> command, {
+    int? channelIndex,
+  }) async {
     state = state.copyWith(
       isControlling: true,
-      clearLastError: true,
+      clearError: true,
+      pendingCommand: DeviceCommand(
+        deviceId: logicalId,
+        dpCode: command.keys.join(','),
+        value: command,
+        channelIndex: channelIndex,
+      ),
     );
 
     try {
@@ -172,42 +163,34 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
       final result = await repository.sendCommand(logicalId, command);
       state = state.copyWith(
         isControlling: false,
+        clearPending: true,
         lastResult: result,
       );
     } catch (e) {
       state = state.copyWith(
         isControlling: false,
+        clearPending: true,
         error: e,
       );
       rethrow;
     }
   }
-
-  /// Kirim perintah countdown.
-  Future<void> setCountdown(
-    Device device,
-    int seconds,
-  ) async {
-    await _sendCommand(device.id, {'countdown_1': seconds});
-  }
 }
 
 /// Provider kontrol perangkat.
-final deviceControlProvider = NotifierProvider<DeviceControlNotifier, DeviceControlState>(
-  DeviceControlNotifier.new,
-);
+final deviceControlProvider =
+    NotifierProvider<DeviceControlNotifier, DeviceControlState>(
+      DeviceControlNotifier.new,
+    );
 
 /// Status monitoring untuk perangkat tertentu.
-final deviceMonitoringProvider = Provider.family<MonitoringDeviceResult?, String>(
-  (ref, logicalId) {
-    final monitoringState = ref.watch(monitoringProvider);
-    final monitoring = monitoringState.monitoring;
-    if (monitoring == null ||
-        monitoring.data == null ||
-        monitoring.data!.lastResult == null) {
-      return null;
-    }
-    final results = monitoring.data!.lastResult!.results;
-    return results.where((r) => r.logicalId == logicalId).firstOrNull;
-  },
-);
+final deviceMonitoringProvider =
+    Provider.family<MonitoringDeviceResult?, String>((ref, logicalId) {
+      final MonitoringState monitoringState = ref.watch(monitoringProvider);
+      final MonitoringResult? result =
+          monitoringState.monitoring?.data?.lastResult;
+      if (result == null) {
+        return null;
+      }
+      return result.results.where((r) => r.logicalId == logicalId).firstOrNull;
+    });

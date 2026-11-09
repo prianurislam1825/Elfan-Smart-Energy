@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/color_tokens.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/device_model.dart';
+import '../../../data/models/monitoring_model.dart';
 import '../../../data/providers/device_providers.dart';
 import '../../../data/providers/device_control_provider.dart';
 import '../../../shared/widgets/elfan_brand.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../data/services/api_exception.dart';
 
 /// Halaman detail perangkat.
 class DeviceDetailScreen extends ConsumerWidget {
@@ -39,8 +42,9 @@ class DeviceDetailScreen extends ConsumerWidget {
         appBar: const ElfanAppBar(title: 'Detail Perangkat'),
         body: _ErrorView(
           error: state.error!,
-          onRetry: () =>
-              ref.read(deviceDetailProvider(deviceId).notifier).refresh(deviceId),
+          onRetry: () => ref
+              .read(deviceDetailProvider(deviceId).notifier)
+              .refresh(deviceId),
         ),
       );
     }
@@ -65,7 +69,9 @@ class DeviceDetailScreen extends ConsumerWidget {
         actions: <Widget>[
           IconButton(
             onPressed: () {
-              ref.read(deviceDetailProvider(deviceId).notifier).refresh(deviceId);
+              ref
+                  .read(deviceDetailProvider(deviceId).notifier)
+                  .refresh(deviceId);
             },
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Muat Ulang',
@@ -107,6 +113,8 @@ class DeviceDetailScreen extends ConsumerWidget {
                     ),
                 ],
               ),
+              const SizedBox(height: 20),
+              _DeviceMonitoringSection(logicalId: device.id),
               const SizedBox(height: 20),
               if (device.isMultiChannel && device.channels != null) ...<Widget>[
                 _InfoSection(
@@ -316,6 +324,47 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
+/// Status koneksi perangkat dan status channel dari endpoint monitoring.
+class _DeviceMonitoringSection extends ConsumerWidget {
+  const _DeviceMonitoringSection({required this.logicalId});
+
+  final String logicalId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final MonitoringDeviceResult? result = ref.watch(
+      deviceMonitoringProvider(logicalId),
+    );
+    if (result == null) {
+      return const SizedBox.shrink();
+    }
+    final Color connectionColor = switch (result.connectionStatus) {
+      ConnectionStatus.online => ColorTokens.success,
+      ConnectionStatus.offline => ColorTokens.danger,
+      ConnectionStatus.unknown => ColorTokens.warning,
+    };
+
+    return _InfoSection(
+      title: 'Monitoring',
+      children: <Widget>[
+        _InfoRow(
+          label: 'Status koneksi',
+          value: result.connectionStatus.displayName.toUpperCase(),
+          valueColor: connectionColor,
+        ),
+        for (final MonitoringChannelResult channel in result.channels)
+          _InfoRow(
+            label: channel.name,
+            value: channel.state.displayName,
+            valueColor: channel.state.isOn
+                ? ColorTokens.success
+                : ColorTokens.textSecondary,
+          ),
+      ],
+    );
+  }
+}
+
 class _ChannelControlDialog extends ConsumerWidget {
   const _ChannelControlDialog({
     required this.device,
@@ -439,6 +488,7 @@ class _ErrorView extends StatelessWidget {
   }
 
   String _getMessage(Object e) {
+    if (e is ApiException) return e.userMessage;
     if (e is String) return e;
     if (e.toString().contains('configuration')) {
       return 'Konfigurasi API belum siap.';

@@ -1,12 +1,12 @@
-import 'package:dio/dio.dart';
-
 import '../../core/constants/api_endpoints.dart';
 import '../models/device_model.dart';
 import '../models/monitoring_model.dart';
+import '../services/api_client.dart';
+import '../services/api_exception.dart';
 
 /// Repository untuk akses data perangkat dan monitoring.
 ///
-/// Menggunakan ApiClient yang disediakan, tidak membuat Dio baru.
+/// Memakai [ApiClient] terpusat, tidak membuat Dio baru.
 class DeviceRepository {
   DeviceRepository({required this.apiClient});
 
@@ -14,10 +14,17 @@ class DeviceRepository {
 
   /// Ambil daftar perangkat dari backend.
   Future<DeviceListResponse> getDevices() async {
-    final Map<String, dynamic> data =
-        await apiClient.get<Map<String, dynamic>>(ApiEndpoints.devices);
-    return DeviceListResponse.tryParse(data) ??
-        DeviceListResponse(total: 0, devices: <Device>[]);
+    final Map<String, dynamic> data = await apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.devices,
+    );
+    final DeviceListResponse? parsed = DeviceListResponse.tryParse(data);
+    if (parsed == null) {
+      throw const ApiException(
+        kind: ApiExceptionKind.unexpected,
+        message: 'Format respons daftar perangkat tidak sesuai.',
+      );
+    }
+    return parsed;
   }
 
   /// Ambil detail perangkat tertentu.
@@ -36,12 +43,19 @@ class DeviceRepository {
     return Device.tryParse(data);
   }
 
+  /// Ambil kondisi perangkat tertentu.
+  Future<Map<String, dynamic>> getDeviceState(String logicalId) {
+    return apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.deviceStatePath(logicalId),
+    );
+  }
+
   /// Kirim perintah ke perangkat.
   Future<Map<String, dynamic>> sendCommand(
     String logicalId,
     Map<String, dynamic> command,
-  ) async {
-    return await apiClient.post<Map<String, dynamic>>(
+  ) {
+    return apiClient.post<Map<String, dynamic>>(
       ApiEndpoints.deviceCommandsPath(logicalId),
       data: command,
     );
@@ -49,17 +63,18 @@ class DeviceRepository {
 
   /// Ambil status monitoring agregat.
   Future<MonitoringStatusResponse> getMonitoringStatus() async {
-    final Map<String, dynamic> data =
-        await apiClient.get<Map<String, dynamic>>(ApiEndpoints.monitoringStatus);
+    final Map<String, dynamic> data = await apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.monitoringStatus,
+    );
     return MonitoringStatusResponse.tryParse(data) ??
-        MonitoringStatusResponse(success: false, data: null);
+        const MonitoringStatusResponse(success: false, data: null);
   }
 
   /// Jalankan pemeriksaan monitoring manual.
   Future<MonitoringStatusResponse> checkMonitoring() async {
-    final Map<String, dynamic> data =
-        await apiClient.post<Map<String, dynamic>>(ApiEndpoints.monitoringCheck);
+    final Map<String, dynamic> data = await apiClient
+        .post<Map<String, dynamic>>(ApiEndpoints.monitoringCheck);
     return MonitoringStatusResponse.tryParse(data) ??
-        MonitoringStatusResponse(success: false, data: null);
+        const MonitoringStatusResponse(success: false, data: null);
   }
 }

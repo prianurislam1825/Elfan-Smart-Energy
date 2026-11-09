@@ -12,6 +12,11 @@ abstract final class AppRoutes {
   static const String cctv = '/cctv';
   static const String energy = '/energy';
 
+  /// Path detail perangkat relatif terhadap [devices].
+  static const String deviceDetailSegment = ':deviceId';
+
+  static String deviceDetail(String logicalId) => '$devices/$logicalId';
+
   static const String initial = home;
 }
 
@@ -21,4 +26,5 @@ abstract final class AppRouteNames {
   static const String voice = 'voice';
   static const String cctv = 'cctv';
   static const String energy = 'energy';
+  static const String deviceDetail = 'deviceDetail';
 }

@@ -126,8 +126,7 @@ class Device {
     return null;
   }
 
-  static List<dynamic>? _asList(Object? value) =>
-      value is List ? value : null;
+  static List<dynamic>? _asList(Object? value) => value is List ? value : null;
   static String? _asText(Object? value) {
     if (value is String) {
       final trimmed = value.trim();

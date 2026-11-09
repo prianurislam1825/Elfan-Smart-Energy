@@ -28,7 +28,7 @@ class MonitoringStatus {
       return null;
     }
 
-    final DateTime? lastRunAt = _parseDateTimeValue(map['last_run_at'], map['lastRunAt']);
+    final DateTime? lastRunAt = _parseDateTimeValue(map['last_run_at']);
     final MonitoringResult? lastResult = MonitoringResult.tryParse(
       map['last_result'] is Map<String, dynamic>
           ? map['last_result'] as Map<String, dynamic>
@@ -43,17 +43,16 @@ class MonitoringStatus {
     );
   }
 
-  static DateTime? _parseDateTimeValue(Object? value1, [Object? value2]) {
-    Object? value = value1;
-    if (value == null && value2 != null) {
-      value = value2;
-    }
+  static DateTime? _parseDateTimeValue(Object? value) {
     if (value is String) {
-      // Coba beberapa format umum
+      final String text = value.trim();
+      if (text.isEmpty) {
+        return null;
+      }
       try {
-        return DateTime.parse(value);
+        return DateTime.parse(text);
       } catch (_) {
-        // continue
+        return null;
       }
     }
     return null;
@@ -125,6 +124,21 @@ class MonitoringResult {
       unsupportedDevices: unsupported,
       results: results,
     );
+  }
+
+  static DateTime? _parseDateTimeValue(Object? value) {
+    if (value is String) {
+      final String text = value.trim();
+      if (text.isEmpty) {
+        return null;
+      }
+      try {
+        return DateTime.parse(text);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
   }
 
   static int? _asInt(Object? value) {

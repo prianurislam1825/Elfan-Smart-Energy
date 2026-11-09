@@ -21,7 +21,6 @@ class DeviceListState {
     this.isLoading = false,
     this.error,
     this.lastRefreshed,
-    this.isChecking = false,
   });
 
   final List<Device> devices;
@@ -29,7 +28,6 @@ class DeviceListState {
   final bool isLoading;
   final Object? error;
   final DateTime? lastRefreshed;
-  final bool isChecking;
 
   DeviceListState copyWith({
     List<Device>? devices,
@@ -38,7 +36,6 @@ class DeviceListState {
     Object? error,
     DateTime? lastRefreshed,
     bool clearError = false,
-    bool? isChecking,
   }) {
     return DeviceListState(
       devices: devices ?? this.devices,
@@ -46,7 +43,6 @@ class DeviceListState {
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
       lastRefreshed: lastRefreshed ?? this.lastRefreshed,
-      isChecking: isChecking ?? this.isChecking,
     );
   }
 
@@ -65,16 +61,14 @@ class DeviceListState {
 
 /// Notifier untuk daftar perangkat.
 class DeviceListNotifier extends Notifier<DeviceListState> {
-  DeviceListNotifier();
-
   @override
   DeviceListState build() {
-    load();
+    Future<void>.microtask(load);
     return const DeviceListState();
   }
 
   Future<void> load() async {
-    if (state.isLoading || state.isChecking) return;
+    if (state.isLoading) return;
 
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -102,9 +96,10 @@ class DeviceListNotifier extends Notifier<DeviceListState> {
 }
 
 /// Provider state daftar perangkat.
-final deviceListProvider = NotifierProvider<DeviceListNotifier, DeviceListState>(
-  DeviceListNotifier.new,
-);
+final deviceListProvider =
+    NotifierProvider<DeviceListNotifier, DeviceListState>(
+      DeviceListNotifier.new,
+    );
 
 /// State: detail perangkat tertentu.
 @immutable
@@ -135,29 +130,35 @@ class DeviceDetailState {
       lastRefreshed: lastRefreshed ?? this.lastRefreshed,
     );
   }
-
-  @override
-  String toString() {
-    return 'DeviceDetailState(device: ${device?.id ?? "(null)"}, isLoading: $isLoading, error: $error)';
-  }
 }
 
-/// Notifier untuk detail perangkat.
+/// Notifier untuk detail perangkat (satu instance per `logical_id`).
 class DeviceDetailNotifier extends Notifier<DeviceDetailState> {
-  DeviceDetailNotifier();
+  DeviceDetailNotifier(this.logicalId);
+
+  /// `logical_id` perangkat yang ditangani provider keluarga ini.
+  final String logicalId;
 
   @override
   DeviceDetailState build() {
+    Future<void>.microtask(() => load(logicalId));
     return const DeviceDetailState();
   }
 
-  Future<void> load(String logicalId) async {
+  Future<void> load(String id) async {
     if (state.isLoading) return;
 
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final repository = ref.read(deviceRepositoryProvider);
-      final device = await repository.getDevice(logicalId);
+      final device = await repository.getDevice(id);
+      if (device == null) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'Perangkat tidak ditemukan pada respons backend.',
+        );
+        return;
+      }
       state = state.copyWith(
         device: device,
         isLoading: false,
@@ -168,59 +169,24 @@ class DeviceDetailNotifier extends Notifier<DeviceDetailState> {
     }
   }
 
-  Future<void> refresh(String logicalId) async {
-    await load(logicalId);
-  }
-}
-
-/// Provider state detail perangkat.
-/// Notifier untuk detail perangkat.
-class DeviceDetailNotifier extends Notifier<DeviceDetailState> {
-  DeviceDetailNotifier();
-
-  @override
-  DeviceDetailState build() {
-    return const DeviceDetailState();
-  }
-
-  Future<void> load(String logicalId) async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, clearError: true);
-    try {
-      final repository = ref.read(deviceRepositoryProvider);
-      final device = await repository.getDevice(logicalId);
-      state = state.copyWith(
-        device: device,
-        isLoading: false,
-        lastRefreshed: DateTime.now(),
-      );
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e);
-    }
-  }
-
-  Future<void> refresh(String logicalId) async {
-    await load(logicalId);
+  Future<void> refresh(String id) async {
+    await load(id);
   }
 }
 
 /// Provider state detail perangkat.
 final deviceDetailProvider =
     NotifierProvider.family<DeviceDetailNotifier, DeviceDetailState, String>(
-  (ref, logicalId) {
-    final notifier = DeviceDetailNotifier();
-    notifier.load(logicalId);
-    return notifier;
-  },
-);
+      DeviceDetailNotifier.new,
+    );
 
 /// State gabungan perangkat dan monitoring.
+@immutable
 class DeviceAndMonitoringState {
   const DeviceAndMonitoringState({
-    this.deviceList,
-    this.monitoring,
-    this.isLoading,
+    required this.deviceList,
+    required this.monitoring,
+    this.isLoading = false,
     this.error,
   });
 
@@ -230,8 +196,7 @@ class DeviceAndMonitoringState {
   final Object? error;
 }
 
-final deviceAndMonitoringProvider =
-    Provider<DeviceAndMonitoringState>((ref) {
+final deviceAndMonitoringProvider = Provider<DeviceAndMonitoringState>((ref) {
   final deviceList = ref.watch(deviceListProvider);
   final monitoring = ref.watch(monitoringProvider);
   final isLoading = deviceList.isLoading || monitoring.isLoading;
@@ -248,7 +213,6 @@ final deviceAndMonitoringProvider =
     error: error,
   );
 });
-
 
 /// State: monitoring status.
 @immutable
@@ -287,16 +251,14 @@ class MonitoringState {
 
 /// Notifier untuk monitoring.
 class MonitoringNotifier extends Notifier<MonitoringState> {
-  MonitoringNotifier();
-
   @override
   MonitoringState build() {
-    load();
+    Future<void>.microtask(load);
     return const MonitoringState();
   }
 
   Future<void> load() async {
-    if (state.isLoading && !state.isChecking) return;
+    if (state.isLoading) return;
 
     state = state.copyWith(
       isLoading: true,
@@ -339,6 +301,7 @@ class MonitoringNotifier extends Notifier<MonitoringState> {
 }
 
 /// Provider state monitoring.
-final monitoringProvider = NotifierProvider<MonitoringNotifier, MonitoringState>(
-  MonitoringNotifier.new,
-);
+final monitoringProvider =
+    NotifierProvider<MonitoringNotifier, MonitoringState>(
+      MonitoringNotifier.new,
+    );

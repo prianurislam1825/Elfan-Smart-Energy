@@ -11,8 +11,8 @@ import '../../../data/providers/device_control_provider.dart';
 import '../../../shared/widgets/elfan_brand.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/info_chip.dart';
-
-part 'devices_screen_state.dart';
+import '../../../data/services/api_exception.dart';
+import 'device_detail_screen.dart';
 
 /// Daftar dan detail perangkat ELFAN.
 ///
@@ -36,7 +36,10 @@ class DevicesScreen extends ConsumerWidget {
           child: deviceState.isLoading && monitoringState.isLoading
               ? const _LoadingView()
               : deviceState.isEmpty && monitoringState.monitoring == null
-              ? const _EmptyView()
+              ? _EmptyView(
+                  onRefresh: () =>
+                      ref.read(deviceListProvider.notifier).refresh(),
+                )
               : ListView(
                   padding: EdgeInsets.fromLTRB(
                     Responsive.pagePadding(context),
@@ -48,11 +51,9 @@ class DevicesScreen extends ConsumerWidget {
                     if (monitoringState.monitoring?.data != null &&
                         monitoringState.monitoring!.data!.lastResult != null)
                       _MonitoringSummaryCard(
-                        monitoring: monitoringState.monitoring!.data!.lastResult!,
+                        status: monitoringState.monitoring!.data!,
                         isChecking: monitoringState.isChecking,
                         lastRefreshed: monitoringState.lastRefreshed,
-                        onRefresh: () =>
-                            ref.read(monitoringProvider.notifier).refresh(),
                         onCheck: () {
                           if (!monitoringState.isChecking) {
                             ref.read(monitoringProvider.notifier).check();
@@ -115,7 +116,9 @@ class _LoadingView extends StatelessWidget {
 }
 
 class _EmptyView extends StatelessWidget {
-  const _EmptyView();
+  const _EmptyView({required this.onRefresh});
+
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +133,7 @@ class _EmptyView extends StatelessWidget {
         child: ResponsiveContent(
           child: ListView(
             padding: EdgeInsets.fromLTRB(padding, 20, padding, 28),
-            children: const <Widget>[
+            children: <Widget>[
               EmptyState(
                 icon: Icons.devices_other_outlined,
                 title: 'Belum ada data perangkat',
@@ -140,9 +143,9 @@ class _EmptyView extends StatelessWidget {
                     'perangkat contoh.',
                 footnote: 'ELFAN Mobile V2',
                 action: FilledButton.icon(
-                  onPressed: null, // Tidak bisa retry tanpa data
-                  icon: Icon(Icons.refresh),
-                  label: Text('Muat Ulang'),
+                  onPressed: onRefresh,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Muat Ulang'),
                 ),
               ),
             ],
@@ -179,12 +182,14 @@ class _ErrorView extends StatelessWidget {
   }
 
   String _getMessage(Object e) {
+    if (e is ApiException) return e.userMessage;
     if (e is String) return e;
     final String message = e.toString();
     if (message.contains('configuration')) {
       return 'Konfigurasi API belum siap. Hubungi administrator.';
     }
-    if (message.contains('timeout') || message.contains('Tidak dapat terhubung')) {
+    if (message.contains('timeout') ||
+        message.contains('Tidak dapat terhubung')) {
       return 'Tidak dapat terhubung ke server. Periksa koneksi Anda.';
     }
     if (message.contains('server')) {
@@ -194,24 +199,25 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-class _MonitoringSummaryCard extends ConsumerWidget {
+class _MonitoringSummaryCard extends StatelessWidget {
   const _MonitoringSummaryCard({
-    required this.monitoring,
+    required this.status,
     required this.isChecking,
     required this.lastRefreshed,
-    required this.onRefresh,
     required this.onCheck,
   });
 
-  final MonitoringResult monitoring;
+  /// Status monitoring agregat dari backend (`running`, `last_result`, ...).
+  final MonitoringStatus status;
   final bool isChecking;
   final DateTime? lastRefreshed;
-  final VoidCallback onRefresh;
   final VoidCallback onCheck;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final MonitoringResult? monitoring = status.lastResult;
+    final DateTime? lastChecked = monitoring?.checkedAt ?? lastRefreshed;
 
     return Card(
       child: Padding(
@@ -222,14 +228,14 @@ class _MonitoringSummaryCard extends ConsumerWidget {
             Row(
               children: <Widget>[
                 Icon(
-                  monitoring.running ? Icons.speed : Icons.slow_motion,
+                  status.running ? Icons.speed : Icons.slow_motion_video,
                   size: 20,
                   color: ColorTokens.primary,
                 ),
                 const SizedBox(width: 8),
                 Text('Monitoring', style: textTheme.titleMedium),
                 const Spacer(),
-                if (monitoring.running)
+                if (status.running)
                   InfoChip(
                     label: 'Sedang berjalan',
                     icon: Icons.check_circle_outline_rounded,
@@ -249,21 +255,21 @@ class _MonitoringSummaryCard extends ConsumerWidget {
                 Expanded(
                   child: _MonitorStatItem(
                     label: 'Total',
-                    value: monitoring.totalDevices.toString(),
+                    value: (monitoring?.totalDevices ?? 0).toString(),
                   ),
                 ),
                 Container(width: 1, height: 32, color: ColorTokens.border),
                 Expanded(
                   child: _MonitorStatItem(
                     label: 'Terpantau',
-                    value: monitoring.monitoredDevices.toString(),
+                    value: (monitoring?.monitoredDevices ?? 0).toString(),
                   ),
                 ),
                 Container(width: 1, height: 32, color: ColorTokens.border),
                 Expanded(
                   child: _MonitorStatItem(
                     label: 'Supported',
-                    value: monitoring.supportedDevices.toString(),
+                    value: (monitoring?.supportedDevices ?? 0).toString(),
                   ),
                 ),
               ],
@@ -274,7 +280,7 @@ class _MonitoringSummaryCard extends ConsumerWidget {
                 Expanded(
                   child: _MonitorConnectionStat(
                     label: 'Online',
-                    count: monitoring.online,
+                    count: monitoring?.online ?? 0,
                     color: ColorTokens.success,
                   ),
                 ),
@@ -282,7 +288,7 @@ class _MonitoringSummaryCard extends ConsumerWidget {
                 Expanded(
                   child: _MonitorConnectionStat(
                     label: 'Offline',
-                    count: monitoring.offline,
+                    count: monitoring?.offline ?? 0,
                     color: ColorTokens.danger,
                   ),
                 ),
@@ -290,7 +296,7 @@ class _MonitoringSummaryCard extends ConsumerWidget {
                 Expanded(
                   child: _MonitorConnectionStat(
                     label: 'Unknown',
-                    count: monitoring.unknown,
+                    count: monitoring?.unknown ?? 0,
                     color: ColorTokens.warning,
                   ),
                 ),
@@ -298,7 +304,7 @@ class _MonitoringSummaryCard extends ConsumerWidget {
                 Expanded(
                   child: _MonitorConnectionStat(
                     label: 'Unsupported',
-                    count: monitoring.unsupportedDevices,
+                    count: monitoring?.unsupportedDevices ?? 0,
                     color: ColorTokens.textSecondary,
                   ),
                 ),
@@ -307,7 +313,7 @@ class _MonitoringSummaryCard extends ConsumerWidget {
             const SizedBox(height: 16),
             Row(
               children: <Widget>[
-                if (lastRefreshed != null) ...<Widget>[
+                if (lastChecked != null) ...<Widget>[
                   Icon(
                     Icons.access_time,
                     size: 14,
@@ -315,7 +321,7 @@ class _MonitoringSummaryCard extends ConsumerWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Terakhir: ${_formatDateTime(lastRefreshed!)}',
+                    'Terakhir: ${_formatDateTime(lastChecked)}',
                     style: textTheme.labelSmall,
                   ),
                   const SizedBox(width: 16),
@@ -558,16 +564,16 @@ class _DeviceTile extends ConsumerWidget {
     final isControlling = controlState.pendingCommand?.deviceId == device.id;
 
     final deviceTypeChip = _getTypeChip(device.type, device.category);
+    final MonitoringDeviceResult? monitoring = ref.watch(
+      deviceMonitoringProvider(device.id),
+    );
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: device.isVerificationRequired
             ? null
-            : () {
-                // Navigasi ke detail perangkat
-                // TBD: Implementasi halaman detail
-              },
+            : () => DeviceDetailScreen.navigate(context, device.id),
         borderRadius: BorderRadius.circular(ComponentTheme.cardRadius),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -619,6 +625,12 @@ class _DeviceTile extends ConsumerWidget {
                           icon: deviceTypeChip.icon,
                           tone: deviceTypeChip.tone,
                         ),
+                        if (monitoring != null)
+                          InfoChip(
+                            label: _connectionLabel(monitoring),
+                            icon: Icons.wifi_tethering_rounded,
+                            tone: _connectionTone(monitoring),
+                          ),
                         if (!device.enabled)
                           InfoChip(
                             label: 'Nonaktif',
@@ -693,6 +705,18 @@ class _DeviceTile extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _connectionLabel(MonitoringDeviceResult monitoring) {
+    return monitoring.connectionStatus.displayName.toUpperCase();
+  }
+
+  ChipTone _connectionTone(MonitoringDeviceResult monitoring) {
+    return switch (monitoring.connectionStatus) {
+      ConnectionStatus.online => ChipTone.success,
+      ConnectionStatus.offline => ChipTone.danger,
+      ConnectionStatus.unknown => ChipTone.warning,
+    };
   }
 
   _DeviceTypeChip _getTypeChip(String type, String category) {

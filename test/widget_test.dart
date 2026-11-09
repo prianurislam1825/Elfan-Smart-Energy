@@ -16,8 +16,9 @@ import 'package:elfan_mobile/core/config/app_config.dart';
 
 void main() {
   group('ElfanApp widget', () {
-    testWidgets('menampilkan aplikasi ELFAN dan lima menu utama',
-        (WidgetTester tester) async {
+    testWidgets('menampilkan aplikasi ELFAN dan lima menu utama', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -50,14 +51,14 @@ void main() {
 
       expect(find.text('ELFAN'), findsOneWidget);
 
-      final ThemeData themeData =
-          tester.widget<MaterialApp>(find.byType(MaterialApp)).theme!;
+      final ThemeData themeData = tester
+          .widget<MaterialApp>(find.byType(MaterialApp))
+          .theme!;
       expect(themeData.colorScheme.primary, ColorTokens.primary);
       expect(themeData.brightness, Brightness.light);
     });
 
-    testWidgets('memindahkan antar menu utama',
-        (WidgetTester tester) async {
+    testWidgets('memindahkan antar menu utama', (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [

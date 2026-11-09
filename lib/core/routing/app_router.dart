@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/cctv/screens/cctv_screen.dart';
 import '../../features/dashboard/screens/home_screen.dart';
+import '../../features/devices/screens/device_detail_screen.dart';
 import '../../features/devices/screens/devices_screen.dart';
 import '../../features/energy/screens/energy_screen.dart';
 import '../../features/voice/screens/voice_screen.dart';
@@ -53,6 +54,17 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
             AppRoutes.devices,
             AppRouteNames.devices,
             const DevicesScreen(),
+            routes: <RouteBase>[
+              GoRoute(
+                path: AppRoutes.deviceDetailSegment,
+                name: AppRouteNames.deviceDetail,
+                builder: (BuildContext context, GoRouterState state) {
+                  return DeviceDetailScreen(
+                    deviceId: state.pathParameters['deviceId'] ?? '',
+                  );
+                },
+              ),
+            ],
           ),
           _branch(AppRoutes.voice, AppRouteNames.voice, const VoiceScreen()),
           _branch(AppRoutes.cctv, AppRouteNames.cctv, const CctvScreen()),
@@ -69,13 +81,19 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-StatefulShellBranch _branch(String path, String name, Widget screen) {
+StatefulShellBranch _branch(
+  String path,
+  String name,
+  Widget screen, {
+  List<RouteBase> routes = const <RouteBase>[],
+}) {
   return StatefulShellBranch(
     routes: <RouteBase>[
       GoRoute(
         path: path,
         name: name,
         builder: (BuildContext context, GoRouterState state) => screen,
+        routes: routes,
       ),
     ],
   );
