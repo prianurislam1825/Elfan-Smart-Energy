@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/config/app_config.dart';
 import '../../../core/config/app_config_provider.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/routing/app_routes.dart';
 import '../../../core/theme/color_tokens.dart';
 import '../../../core/theme/component_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../shared/utils/error_message.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/backend_health_model.dart';
 import '../../../data/models/device_model.dart';
 import '../../../data/models/monitoring_model.dart';
 import '../../../data/providers/backend_health_provider.dart';
 import '../../../data/providers/device_providers.dart';
-import '../../../data/services/api_exception.dart';
 import '../../../shared/widgets/elfan_brand.dart';
 import '../../../shared/widgets/info_chip.dart';
 
@@ -48,6 +50,11 @@ class HomeScreen extends ConsumerWidget {
         title: 'Home',
         subtitle: 'Ringkasan fasilitas',
         actions: <Widget>[
+          IconButton(
+            onPressed: () => context.push(AppRoutes.settings),
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Pengaturan',
+          ),
           IconButton(
             onPressed: refreshAll,
             icon: const Icon(Icons.refresh_rounded),
@@ -127,7 +134,7 @@ class _WelcomeCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  AppConstants.foundationPhaseLabel,
+                  AppConstants.platformLabel,
                   style: textTheme.labelSmall?.copyWith(color: Colors.white),
                 ),
               ),
@@ -266,18 +273,11 @@ class _BackendStatusCard extends StatelessWidget {
         }
         return parts.join(' ');
       case BackendConnectionStatus.unreachable:
-        return _errorMessage(state.error);
+        return describeApiError(
+          state.error,
+          fallback: 'Tidak dapat memeriksa koneksi backend.',
+        );
     }
-  }
-
-  String _errorMessage(Object? error) {
-    if (error is ApiException) {
-      return error.userMessage;
-    }
-    if (error is String) {
-      return error;
-    }
-    return 'Tidak dapat memeriksa koneksi backend.';
   }
 
   IconData _iconFor(BackendConnectionStatus status) {
@@ -358,7 +358,13 @@ class _DeviceSummaryCard extends StatelessWidget {
               )
             else if (deviceList.error != null &&
                 deviceList.devices.isEmpty) ...<Widget>[
-              Text(_errorMessage(deviceList.error), style: textTheme.bodySmall),
+              Text(
+                describeApiError(
+                  deviceList.error,
+                  fallback: 'Gagal memuat data perangkat.',
+                ),
+                style: textTheme.bodySmall,
+              ),
             ] else ...<Widget>[
               Row(
                 children: <Widget>[
@@ -485,16 +491,6 @@ class _DeviceSummaryCard extends StatelessWidget {
     if (monitor == null) return devices;
     return devices.isAfter(monitor) ? devices : monitor;
   }
-
-  String _errorMessage(Object? error) {
-    if (error is ApiException) {
-      return error.userMessage;
-    }
-    if (error is String) {
-      return error;
-    }
-    return 'Gagal memuat data perangkat.';
-  }
 }
 
 /// Ringkasan jumlah perangkat per lokasi.
@@ -528,7 +524,14 @@ class _LocationSummaryCard extends StatelessWidget {
                   color: ColorTokens.primary,
                 ),
                 const SizedBox(width: 8),
-                Text('Ringkasan lokasi', style: textTheme.titleMedium),
+                Expanded(
+                  child: Text(
+                    'Ringkasan lokasi',
+                    style: textTheme.titleMedium,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),

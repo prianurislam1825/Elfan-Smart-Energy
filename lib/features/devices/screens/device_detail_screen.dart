@@ -2,80 +2,132 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/routing/app_routes.dart';
 import '../../../core/theme/color_tokens.dart';
+import '../../../core/theme/component_theme.dart';
 import '../../../core/utils/date_format.dart';
+import '../../../core/utils/device_type.dart';
+import '../../../shared/utils/error_message.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/device_model.dart';
 import '../../../data/models/device_state_model.dart';
 import '../../../data/models/monitoring_model.dart';
-import '../../../data/providers/device_providers.dart';
 import '../../../data/providers/device_control_provider.dart';
+import '../../../data/providers/device_providers.dart';
 import '../../../shared/widgets/elfan_brand.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../../../data/services/api_exception.dart';
+import '../../../shared/widgets/error_state.dart';
+import '../../../shared/widgets/info_chip.dart';
+import '../../../shared/widgets/info_row.dart';
+import '../../../shared/widgets/section_card.dart';
+import '../widgets/device_status.dart';
 
 /// Halaman detail perangkat.
+///
+/// Sumber data:
+/// - `GET /api/v1/devices/{logical_id}` untuk informasi perangkat,
+/// - `GET /api/v1/devices/{logical_id}/state` untuk status koneksi dan state
+///   kanal terbaru.
+///
+/// Status koneksi dan state kanal ditampilkan terpisah. Kondisi yang tidak
+/// dikirim backend ditulis `belum tersedia`, tidak ditebak menjadi OFF.
 class DeviceDetailScreen extends ConsumerWidget {
   const DeviceDetailScreen({super.key, required this.deviceId});
 
   final String deviceId;
 
   static void navigate(BuildContext context, String deviceId) {
-    context.push('/devices/$deviceId');
+    context.pushNamed(
+      AppRouteNames.deviceDetail,
+      pathParameters: <String, String>{'deviceId': deviceId},
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final DeviceDetailState state = ref.watch(deviceDetailProvider(deviceId));
-    final controlState = ref.watch(deviceControlProvider);
+    final DeviceDetailState detail = ref.watch(deviceDetailProvider(deviceId));
+    final DeviceStateViewState stateView = ref.watch(
+      deviceStateProvider(deviceId),
+    );
+    final double padding = Responsive.pagePadding(context);
 
-    if (state.isLoading) {
+    final Device? device = detail.device;
+
+    if (device == null) {
       return Scaffold(
         appBar: const ElfanAppBar(
           title: 'Detail Perangkat',
-          subtitle: 'Memuat...',
+          subtitle: 'Perangkat',
+          showBrand: false,
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: SafeArea(
+          top: false,
+          child: ResponsiveContent(
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(padding, 20, padding, 28),
+              children: <Widget>[
+                if (detail.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: ComponentTheme.space24,
+                    ),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (detail.error != null)
+                  ErrorState(
+                    title: 'Gagal memuat detail',
+                    error: detail.error,
+                    onRetry: () => ref
+                        .read(deviceDetailProvider(deviceId).notifier)
+                        .refresh(deviceId),
+                  )
+                else
+                  const EmptyState(
+                    icon: Icons.devices_other_outlined,
+                    title: 'Perangkat tidak ditemukan',
+                    message:
+                        'Perangkat dengan ID tersebut tidak tersedia pada '
+                        'respons backend.',
+                    footnote: 'ELFAN Mobile V2',
+                  ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
-    if (state.error != null && state.device == null) {
-      return Scaffold(
-        appBar: const ElfanAppBar(title: 'Detail Perangkat'),
-        body: _ErrorView(
-          error: state.error!,
-          onRetry: () => ref
-              .read(deviceDetailProvider(deviceId).notifier)
-              .refresh(deviceId),
-        ),
-      );
-    }
+    final List<DeviceChannel> channels =
+        device.channels ?? const <DeviceChannel>[];
+    final DeviceTypeInfo typeInfo = deviceTypeInfoFor(
+      category: device.category,
+      type: device.type,
+      channelCount: channels.length,
+    );
+    final Map<String, MonitoringChannelResult> statesByDp =
+        <String, MonitoringChannelResult>{
+          for (final MonitoringChannelResult channel
+              in stateView.snapshot?.channels ??
+                  const <MonitoringChannelResult>[])
+            channel.switchDp: channel,
+        };
+    final String? controlBlockedReason = _controlBlockedReason(device);
 
-    final device = state.device;
-    if (device == null) {
-      return Scaffold(
-        appBar: const ElfanAppBar(title: 'Detail Perangkat'),
-        body: const EmptyState(
-          icon: Icons.devices_other_outlined,
-          title: 'Perangkat tidak ditemukan',
-          message: 'Perangkat dengan ID tersebut tidak tersedia.',
-          footnote: 'ELFAN Mobile V2',
-        ),
-      );
+    Future<void> refreshAll() async {
+      await Future.wait(<Future<void>>[
+        ref.read(deviceDetailProvider(deviceId).notifier).refresh(deviceId),
+        ref.read(deviceStateProvider(deviceId).notifier).refresh(),
+      ]);
     }
 
     return Scaffold(
       appBar: ElfanAppBar(
         title: device.name,
-        subtitle: device.location,
+        subtitle: device.location.isEmpty ? 'Tanpa lokasi' : device.location,
+        showBrand: false,
         actions: <Widget>[
           IconButton(
-            onPressed: () {
-              ref
-                  .read(deviceDetailProvider(deviceId).notifier)
-                  .refresh(deviceId);
-              ref.read(deviceStateProvider(deviceId).notifier).refresh();
-            },
+            onPressed: refreshAll,
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Muat Ulang',
           ),
@@ -84,220 +136,185 @@ class DeviceDetailScreen extends ConsumerWidget {
       body: SafeArea(
         top: false,
         child: ResponsiveContent(
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(
-              Responsive.pagePadding(context),
-              20,
-              Responsive.pagePadding(context),
-              28,
-            ),
-            children: <Widget>[
-              _InfoSection(
-                title: 'Informasi Perangkat',
-                children: <Widget>[
-                  _InfoRow(label: 'Nama', value: device.name),
-                  _InfoRow(label: 'Tipe', value: _capitalize(device.type)),
-                  _InfoRow(label: 'Kategori', value: device.category),
-                  _InfoRow(
-                    label: 'Lokasi',
-                    value: device.location.isEmpty
-                        ? 'Belum ditentukan'
-                        : device.location,
+          child: RefreshIndicator(
+            onRefresh: refreshAll,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(padding, 20, padding, 28),
+              children: <Widget>[
+                SectionCard(
+                  title: 'Informasi perangkat',
+                  icon: Icons.info_outline_rounded,
+                  trailing: InfoChip(
+                    label: typeInfo.label,
+                    icon: typeInfo.icon,
+                    tone: ChipTone.primary,
                   ),
-                  _InfoRow(
-                    label: 'Status',
-                    value: device.enabled ? 'Aktif' : 'Nonaktif',
-                  ),
-                  if (device.isVerificationRequired)
-                    _InfoRow(
-                      label: 'Verifikasi',
-                      value: 'Diperlukan',
-                      valueColor: ColorTokens.danger,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _DeviceStateSection(logicalId: device.id),
-              const SizedBox(height: 20),
-              if (device.isMultiChannel && device.channels != null) ...<Widget>[
-                _InfoSection(
-                  title: 'Channel (${device.channels!.length})',
                   children: <Widget>[
-                    ...device.channels!.asMap().entries.map((entry) {
-                      final channel = entry.value;
-                      final channelNum = entry.key + 1;
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: channel.isOn
-                                ? ColorTokens.successSoft
-                                : ColorTokens.background,
-                            child: Icon(
-                              _channelIcon(channel),
-                              color: channel.isOn
-                                  ? ColorTokens.success
-                                  : ColorTokens.textSecondary,
-                              size: 12,
-                            ),
-                          ),
-                          title: Text('Kanal $channelNum: ${channel.name}'),
-                          subtitle: Text(
-                            'Kondisi: ${_channelStateLabel(channel)}',
-                          ),
-                          trailing: channel.isOn
-                              ? const Icon(
-                                  Icons.toggle_on,
-                                  color: ColorTokens.success,
-                                )
-                              : channel.isOff
-                              ? const Icon(
-                                  Icons.toggle_off,
-                                  color: ColorTokens.textSecondary,
-                                )
-                              : const Icon(
-                                  Icons.help_outline_rounded,
-                                  color: ColorTokens.warning,
-                                ),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => _ChannelControlDialog(
-                                device: device,
-                                channelIndex: channelNum - 1,
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    }),
+                    InfoRow(label: 'Nama', value: device.name),
+                    InfoRow(
+                      label: 'Lokasi',
+                      value: device.location.isEmpty
+                          ? 'Belum ditentukan'
+                          : device.location,
+                    ),
+                    InfoRow(
+                      label: 'Kategori',
+                      value: device.category.isEmpty
+                          ? 'Tidak dikirim backend'
+                          : device.category,
+                    ),
+                    InfoRow(
+                      label: 'Status perangkat',
+                      value: device.enabled ? 'Aktif' : 'Dinonaktifkan',
+                      valueColor: device.enabled
+                          ? ColorTokens.success
+                          : ColorTokens.warning,
+                    ),
+                    if (device.isVerificationRequired)
+                      const InfoRow(
+                        label: 'Verifikasi',
+                        value: 'Diperlukan sebelum kontrol',
+                        valueColor: ColorTokens.danger,
+                      ),
+                    if (device.statusMode != null)
+                      InfoRow(label: 'Mode status', value: device.statusMode!),
+                    if (device.note != null)
+                      InfoRow(label: 'Catatan', value: device.note!),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: ComponentTheme.space16),
+                _DeviceStateSection(
+                  view: stateView,
+                  onRetry: () => ref
+                      .read(deviceStateProvider(deviceId).notifier)
+                      .refresh(),
+                ),
+                const SizedBox(height: ComponentTheme.space16),
+                SectionCard(
+                  title: channels.isEmpty
+                      ? 'Kanal'
+                      : 'Kanal (${channels.length})',
+                  icon: Icons.tune_rounded,
+                  children: <Widget>[
+                    if (channels.isEmpty)
+                      Text(
+                        'Backend tidak mengirim daftar kanal untuk perangkat '
+                        'ini, sehingga kontrol ON/OFF tidak ditampilkan.',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    else
+                      for (final (int index, DeviceChannel channel)
+                          in channels.indexed)
+                        _ChannelRow(
+                          index: index,
+                          channel: channel,
+                          state: statesByDp[channel.switchDp]?.state,
+                          enabled: controlBlockedReason == null,
+                          onTap: () => showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                _ChannelControlDialog(
+                                  device: device,
+                                  channelIndex: index,
+                                ),
+                          ),
+                        ),
+                  ],
+                ),
+                const SizedBox(height: ComponentTheme.space16),
+                _ControlSection(
+                  device: device,
+                  blockedReason: controlBlockedReason,
+                  onTurnOn: () =>
+                      ref.read(deviceControlProvider.notifier).turnOn(device),
+                  onTurnOff: () =>
+                      ref.read(deviceControlProvider.notifier).turnOff(device),
+                  onCompleted: refreshAll,
+                ),
               ],
-              _InfoSection(
-                title: 'Kontrol',
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: FilledButton.icon(
-                          onPressed:
-                              controlState.isControlling ||
-                                  device.isVerificationRequired
-                              ? null
-                              : () async {
-                                  if (device.isMultiChannel) {
-                                    await ref
-                                        .read(deviceControlProvider.notifier)
-                                        .turnAllOn(device);
-                                  } else {
-                                    await ref
-                                        .read(deviceControlProvider.notifier)
-                                        .turnOn(device);
-                                  }
-                                  if (context.mounted) {
-                                    ref
-                                        .read(
-                                          deviceDetailProvider(
-                                            deviceId,
-                                          ).notifier,
-                                        )
-                                        .refresh(deviceId);
-                                  }
-                                },
-                          icon: const Icon(Icons.power_settings_new, size: 18),
-                          label: const Text('Nyalakan'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed:
-                              controlState.isControlling ||
-                                  device.isVerificationRequired
-                              ? null
-                              : () async {
-                                  if (device.isMultiChannel) {
-                                    await ref
-                                        .read(deviceControlProvider.notifier)
-                                        .turnAllOff(device);
-                                  } else {
-                                    await ref
-                                        .read(deviceControlProvider.notifier)
-                                        .turnOff(device);
-                                  }
-                                  if (context.mounted) {
-                                    ref
-                                        .read(
-                                          deviceDetailProvider(
-                                            deviceId,
-                                          ).notifier,
-                                        )
-                                        .refresh(deviceId);
-                                  }
-                                },
-                          icon: const Icon(Icons.power_off, size: 18),
-                          label: const Text('Matikan'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    device.isVerificationRequired
-                        ? 'Perangkat ini memerlukan verifikasi sebelum dikontrol.'
-                        : 'Perintah dikirim melalui backend.',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  String _capitalize(String text) {
-    if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1);
-  }
-
-  /// Label kondisi kanal. Perangkat dari endpoint detail tidak selalu memuat
-  /// `state`, sehingga kondisi yang tidak diketahui ditulis apa adanya.
-  String _channelStateLabel(DeviceChannel channel) {
-    if (channel.isOn) return 'ON';
-    if (channel.isOff) return 'OFF';
-    return 'belum tersedia';
-  }
-
-  IconData _channelIcon(DeviceChannel channel) {
-    if (channel.isOn) return Icons.check_circle;
-    if (channel.isOff) return Icons.circle;
-    return Icons.help_outline_rounded;
+  /// Alasan kontrol tidak boleh dikirim, atau `null` jika aman.
+  String? _controlBlockedReason(Device device) {
+    if (device.isVerificationRequired) {
+      return 'Perangkat ini memerlukan verifikasi sebelum dikontrol.';
+    }
+    if (!device.enabled) {
+      return 'Perangkat dinonaktifkan di backend, sehingga kontrol diblokir.';
+    }
+    if (!device.hasChannels) {
+      return 'DP kontrol kanal belum tersedia dari backend.';
+    }
+    return null;
   }
 }
 
-class _InfoSection extends StatelessWidget {
-  const _InfoSection({required this.title, required this.children});
+class _ChannelRow extends StatelessWidget {
+  const _ChannelRow({
+    required this.index,
+    required this.channel,
+    required this.state,
+    required this.enabled,
+    required this.onTap,
+  });
 
-  final String title;
-  final List<Widget> children;
+  final int index;
+  final DeviceChannel channel;
+  final ChannelState? state;
+  final bool enabled;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    return Card(
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(ComponentTheme.radiusMedium),
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(
+          vertical: ComponentTheme.space8,
+          horizontal: ComponentTheme.space4,
+        ),
+        child: Row(
           children: <Widget>[
-            Text(title, style: textTheme.titleMedium),
-            const SizedBox(height: 12),
-            ...children,
+            Icon(channelIcon(state), size: 22, color: channelIconColor(state)),
+            const SizedBox(width: ComponentTheme.space8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    '${index + 1}. ${channel.name}',
+                    style: textTheme.bodyMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    'Kondisi: ${channelStateLabel(state)}',
+                    style: textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+            if (enabled)
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: ColorTokens.textSecondary,
+              )
+            else
+              const InfoChip(
+                label: 'Terkunci',
+                icon: Icons.lock_outline_rounded,
+                tone: ChipTone.warning,
+              ),
           ],
         ),
       ),
@@ -305,64 +322,29 @@ class _InfoSection extends StatelessWidget {
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value, this.valueColor});
+/// Kondisi perangkat dan state kanal dari `GET /api/v1/devices/{id}/state`.
+class _DeviceStateSection extends StatelessWidget {
+  const _DeviceStateSection({required this.view, required this.onRetry});
 
-  final String label;
-  final String value;
-  final Color? valueColor;
+  final DeviceStateViewState view;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: textTheme.bodyMedium?.copyWith(
-                color: ColorTokens.textSecondary,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: textTheme.bodyMedium?.copyWith(
-                color: valueColor,
-                fontWeight: valueColor != null
-                    ? FontWeight.w500
-                    : FontWeight.normal,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Kondisi perangkat dan state kanal dari `GET /api/v1/devices/{id}/state`.
-///
-/// Status koneksi perangkat ditampilkan terpisah dari kondisi ON/OFF kanal.
-class _DeviceStateSection extends ConsumerWidget {
-  const _DeviceStateSection({required this.logicalId});
-
-  final String logicalId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final DeviceStateViewState view = ref.watch(deviceStateProvider(logicalId));
     final DeviceStateSnapshot? snapshot = view.snapshot;
 
-    if (snapshot == null) {
-      return _InfoSection(
-        title: 'Kondisi perangkat',
-        children: <Widget>[
+    return SectionCard(
+      title: 'Kondisi perangkat',
+      icon: Icons.sensors_outlined,
+      trailing: snapshot == null
+          ? null
+          : InfoChip(
+              label: connectionLabel(snapshot.connectionStatus),
+              icon: Icons.wifi_tethering_rounded,
+              tone: connectionTone(snapshot.connectionStatus),
+            ),
+      children: <Widget>[
+        if (snapshot == null) ...<Widget>[
           if (view.isLoading)
             const Row(
               children: <Widget>[
@@ -371,7 +353,7 @@ class _DeviceStateSection extends ConsumerWidget {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: ComponentTheme.space8),
                 Text('Memuat kondisi perangkat...'),
               ],
             )
@@ -379,81 +361,164 @@ class _DeviceStateSection extends ConsumerWidget {
             Text(
               view.error == null
                   ? 'Kondisi perangkat belum tersedia dari backend.'
-                  : _message(view.error),
+                  : describeApiError(view.error),
+              style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: ComponentTheme.space8),
             OutlinedButton.icon(
-              onPressed: () =>
-                  ref.read(deviceStateProvider(logicalId).notifier).refresh(),
+              onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Muat Kondisi'),
             ),
           ],
-        ],
-      );
-    }
-
-    final Color connectionColor = switch (snapshot.connectionStatus) {
-      ConnectionStatus.online => ColorTokens.success,
-      ConnectionStatus.offline => ColorTokens.danger,
-      ConnectionStatus.unknown => ColorTokens.warning,
-    };
-
-    return _InfoSection(
-      title: 'Kondisi perangkat',
-      children: <Widget>[
-        _InfoRow(
-          label: 'Status koneksi',
-          value: snapshot.connectionStatus.displayName.toUpperCase(),
-          valueColor: connectionColor,
-        ),
-        if (snapshot.lastUpdatedAt != null)
-          _InfoRow(
-            label: 'Diperbarui',
-            value: formatDateTime(snapshot.lastUpdatedAt!),
+        ] else ...<Widget>[
+          InfoRow(
+            label: 'Status koneksi',
+            value: connectionLabel(snapshot.connectionStatus),
+            valueColor: switch (snapshot.connectionStatus) {
+              ConnectionStatus.online => ColorTokens.success,
+              ConnectionStatus.offline => ColorTokens.danger,
+              ConnectionStatus.unknown => ColorTokens.warning,
+            },
           ),
-        if (snapshot.lastSeenAt != null)
-          _InfoRow(
-            label: 'Terakhir terlihat',
-            value: formatDateTime(snapshot.lastSeenAt!),
-          ),
-        if (snapshot.source != null)
-          _InfoRow(label: 'Sumber data', value: snapshot.source!),
-        if (snapshot.error != null)
-          _InfoRow(
-            label: 'Catatan backend',
-            value: snapshot.error!,
-            valueColor: ColorTokens.warning,
-          ),
-        for (final MonitoringChannelResult channel in snapshot.channels)
-          _InfoRow(
-            label: channel.name,
-            value: channel.state.displayName == '--'
-                ? 'belum tersedia'
-                : channel.state.displayName,
-            valueColor: channel.state.isOn
-                ? ColorTokens.success
-                : ColorTokens.textSecondary,
-          ),
-        if (view.isLoading) ...<Widget>[
-          const SizedBox(height: 4),
-          const LinearProgressIndicator(minHeight: 2),
-        ],
-        if (view.error != null && !view.isLoading) ...<Widget>[
-          const SizedBox(height: 8),
-          Text(
-            'Pembaruan kondisi gagal: ${_message(view.error)}',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          if (snapshot.lastUpdatedAt != null)
+            InfoRow(
+              label: 'Diperbarui',
+              value: formatDateTime(snapshot.lastUpdatedAt!),
+            ),
+          if (snapshot.lastSeenAt != null)
+            InfoRow(
+              label: 'Terakhir terlihat',
+              value: formatDateTime(snapshot.lastSeenAt!),
+            ),
+          if (snapshot.source != null)
+            InfoRow(label: 'Sumber data', value: snapshot.source!),
+          if (snapshot.error != null)
+            InfoRow(
+              label: 'Catatan backend',
+              value: snapshot.error!,
+              valueColor: ColorTokens.warning,
+            ),
+          if (snapshot.channels.isEmpty)
+            Text(
+              'Backend tidak mengirim state kanal pada respons ini.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          if (view.isLoading) ...<Widget>[
+            const SizedBox(height: ComponentTheme.space8),
+            const LinearProgressIndicator(minHeight: 2),
+          ],
+          if (view.error != null && !view.isLoading) ...<Widget>[
+            const SizedBox(height: ComponentTheme.space8),
+            Text(
+              'Pembaruan kondisi gagal: ${describeApiError(view.error)}',
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: ColorTokens.warning),
+            ),
+          ],
         ],
       ],
     );
   }
+}
 
-  String _message(Object? error) {
-    if (error is ApiException) return error.userMessage;
-    if (error is String) return error;
-    return 'Gagal memuat kondisi perangkat.';
+/// Tombol kontrol seluruh perangkat.
+class _ControlSection extends StatelessWidget {
+  const _ControlSection({
+    required this.device,
+    required this.blockedReason,
+    required this.onTurnOn,
+    required this.onTurnOff,
+    required this.onCompleted,
+  });
+
+  final Device device;
+  final String? blockedReason;
+  final Future<void> Function() onTurnOn;
+  final Future<void> Function() onTurnOff;
+  final Future<void> Function() onCompleted;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
+    return SectionCard(
+      title: 'Kontrol',
+      icon: Icons.power_settings_new_rounded,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: blockedReason == null
+                    ? () => _run(
+                        context,
+                        onTurnOn,
+                        device.isMultiChannel
+                            ? 'Semua kanal dinyalakan'
+                            : 'Perangkat dinyalakan',
+                      )
+                    : null,
+                icon: const Icon(Icons.power_settings_new, size: 18),
+                label: Text(
+                  device.isMultiChannel ? 'Nyalakan Semua' : 'Nyalakan',
+                ),
+              ),
+            ),
+            const SizedBox(width: ComponentTheme.space12),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: blockedReason == null
+                    ? () => _run(
+                        context,
+                        onTurnOff,
+                        device.isMultiChannel
+                            ? 'Semua kanal dimatikan'
+                            : 'Perangkat dimatikan',
+                      )
+                    : null,
+                icon: const Icon(Icons.power_off, size: 18),
+                label: Text(
+                  device.isMultiChannel ? 'Matikan Semua' : 'Matikan',
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: ComponentTheme.space12),
+        if (blockedReason != null)
+          StatusNote(text: blockedReason!, tone: StatusNoteTone.warning)
+        else
+          Text(
+            'Perintah dikirim ke backend. Kondisi kanal diperbarui setelah '
+            'backend mengonfirmasi, bukan langsung di UI.',
+            style: textTheme.bodySmall,
+          ),
+      ],
+    );
+  }
+
+  Future<void> _run(
+    BuildContext context,
+    Future<void> Function() action,
+    String successMessage,
+  ) async {
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    try {
+      await action();
+      await onCompleted();
+      messenger.showSnackBar(SnackBar(content: Text(successMessage)));
+    } catch (error) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            describeApiError(error, fallback: 'Perintah gagal dikirim.'),
+          ),
+          backgroundColor: ColorTokens.danger,
+        ),
+      );
+    }
   }
 }
 
@@ -468,127 +533,104 @@ class _ChannelControlDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controlState = ref.watch(deviceControlProvider);
+    final DeviceControlState control = ref.watch(deviceControlProvider);
+    final List<DeviceChannel> channels =
+        device.channels ?? const <DeviceChannel>[];
+    final DeviceChannel? channel = channelIndex < channels.length
+        ? channels[channelIndex]
+        : null;
+    final bool busy =
+        control.isControlling && control.pendingCommand?.deviceId == device.id;
 
-    return AlertDialog(
-      title: Text('Kontrol Kanal ${channelIndex + 1}'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          if (controlState.pendingCommand?.deviceId == device.id &&
-              controlState.pendingCommand?.channelIndex == channelIndex)
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                CircularProgressIndicator(strokeWidth: 2),
-                SizedBox(width: 8),
-                Text('Mengirim...'),
-              ],
-            )
-          else ...<Widget>[
+    Future<void> run(bool value) async {
+      final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+      try {
+        await ref
+            .read(deviceControlProvider.notifier)
+            .setChannelState(device, channelIndex, value);
+        await ref.read(deviceStateProvider(device.id).notifier).refresh();
+        // Dialog tidak dapat ditutup selama perintah berjalan (lihat PopScope
+        // di bawah). Pemeriksaan ini menjaga agar penyelesaian perintah tidak
+        // pernah mem-pop halaman detail bila dialog sudah tidak ada.
+        if (!context.mounted) {
+          return;
+        }
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              'Perintah ${value ? 'ON' : 'OFF'} terkirim ke backend.',
+            ),
+          ),
+        );
+        Navigator.of(context).pop();
+      } catch (error) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              describeApiError(error, fallback: 'Perintah gagal dikirim.'),
+            ),
+            backgroundColor: ColorTokens.danger,
+          ),
+        );
+      }
+    }
+
+    return PopScope(
+      // Barrier dan tombol back tidak boleh menutup dialog saat perintah
+      // sedang dikirim, agar pop setelah await tidak mengenai halaman detail.
+      canPop: !busy,
+      child: AlertDialog(
+        title: Text('Kontrol kanal ${channelIndex + 1}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
             Text(
-              device.channels?[channelIndex].name ??
-                  'Kanal ${channelIndex + 1}',
+              channel?.name ?? 'Kanal ${channelIndex + 1}',
+              style: Theme.of(context).textTheme.titleSmall,
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: controlState.isControlling
-                        ? null
-                        : () async {
-                            await ref
-                                .read(deviceControlProvider.notifier)
-                                .setChannelState(device, channelIndex, true);
-                            if (context.mounted) Navigator.of(context).pop();
-                          },
-                    icon: const Icon(Icons.power_settings_new, size: 18),
-                    label: const Text('ON'),
+            const SizedBox(height: ComponentTheme.space12),
+            if (busy)
+              const Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: controlState.isControlling
-                        ? null
-                        : () async {
-                            await ref
-                                .read(deviceControlProvider.notifier)
-                                .setChannelState(device, channelIndex, false);
-                            if (context.mounted) Navigator.of(context).pop();
-                          },
-                    icon: const Icon(Icons.power_off, size: 18),
-                    label: const Text('OFF'),
+                  SizedBox(width: ComponentTheme.space8),
+                  Text('Mengirim...'),
+                ],
+              )
+            else
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () => run(true),
+                      icon: const Icon(Icons.power_settings_new, size: 18),
+                      label: const Text('ON'),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                  const SizedBox(width: ComponentTheme.space12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => run(false),
+                      icon: const Icon(Icons.power_off, size: 18),
+                      label: const Text('OFF'),
+                    ),
+                  ),
+                ],
+              ),
           ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: busy ? null : () => Navigator.of(context).pop(),
+            child: const Text('Tutup'),
+          ),
         ],
       ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Tutup'),
-        ),
-      ],
     );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.error, required this.onRetry});
-
-  final Object error;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Icon(
-              Icons.error_outline_rounded,
-              size: 48,
-              color: ColorTokens.danger,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Gagal memuat detail',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getMessage(error),
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Coba Lagi'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _getMessage(Object e) {
-    if (e is ApiException) return e.userMessage;
-    if (e is String) return e;
-    if (e.toString().contains('configuration')) {
-      return 'Konfigurasi API belum siap.';
-    }
-    if (e.toString().contains('timeout') ||
-        e.toString().contains('Tidak dapat terhubung')) {
-      return 'Tidak dapat terhubung ke server.';
-    }
-    return 'Terjadi kesalahan: ${e.toString().split('\n').first}';
   }
 }

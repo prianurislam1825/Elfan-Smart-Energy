@@ -15,6 +15,7 @@ enum ApiExceptionKind {
   conflict,
   validation,
   server,
+  unsupported,
   unexpected,
 }
 
@@ -116,6 +117,8 @@ class ApiException implements Exception {
     ApiExceptionKind.conflict => 'Permintaan bertentangan dengan data terbaru.',
     ApiExceptionKind.validation => 'Data yang dikirim tidak valid.',
     ApiExceptionKind.server => 'Server mengalami gangguan. Coba lagi nanti.',
+    ApiExceptionKind.unsupported =>
+      'Aksi ini belum didukung oleh perangkat atau backend.',
     ApiExceptionKind.badRequest => 'Permintaan tidak dapat diproses.',
     ApiExceptionKind.unexpected => 'Terjadi kesalahan tak terduga.',
   };

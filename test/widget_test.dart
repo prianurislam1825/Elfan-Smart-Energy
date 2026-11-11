@@ -102,5 +102,46 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(AppDestination.energy.label), findsWidgets);
     });
+
+    testWidgets('membuka halaman Pengaturan dari Home', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appConfigProvider.overrideWith(
+              (ref) => AppConfig(
+                apiBaseUrl: 'https://api.example.test',
+                connectTimeout: const Duration(seconds: 10),
+                receiveTimeout: const Duration(seconds: 20),
+                sendTimeout: const Duration(seconds: 30),
+              ),
+            ),
+            apiClientProvider.overrideWith(
+              (ref) => throw UnimplementedError(
+                'apiClientProvider tidak boleh dipakai dalam tes ini.',
+              ),
+            ),
+          ],
+          child: const ElfanApp(),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Pengaturan'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Pengaturan'), findsWidgets);
+      expect(find.text('Koneksi backend'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Belum tersedia'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Belum tersedia'), findsOneWidget);
+    });
   });
 }

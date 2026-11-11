@@ -11,6 +11,14 @@ abstract final class ComponentTheme {
   static const double cardRadius = 16;
   static const double controlHeight = 48;
 
+  // Skala jarak (spacing) agar padding antar layar konsisten.
+  static const double space4 = 4;
+  static const double space8 = 8;
+  static const double space12 = 12;
+  static const double space16 = 16;
+  static const double space20 = 20;
+  static const double space24 = 24;
+
   static final AppBarTheme appBar = AppBarTheme(
     backgroundColor: ColorTokens.surface,
     foregroundColor: ColorTokens.textPrimary,
@@ -60,6 +68,27 @@ abstract final class ComponentTheme {
         color: selected ? ColorTokens.primary : ColorTokens.textSecondary,
       );
     }),
+  );
+
+  static final NavigationRailThemeData navigationRail = NavigationRailThemeData(
+    backgroundColor: ColorTokens.surface,
+    indicatorColor: ColorTokens.primarySoft,
+    elevation: 0,
+    labelType: NavigationRailLabelType.all,
+    selectedIconTheme: const IconThemeData(
+      size: 24,
+      color: ColorTokens.primary,
+    ),
+    unselectedIconTheme: const IconThemeData(
+      size: 24,
+      color: ColorTokens.textSecondary,
+    ),
+    selectedLabelTextStyle: TextStyles.textTheme.labelMedium?.copyWith(
+      color: ColorTokens.primary,
+    ),
+    unselectedLabelTextStyle: TextStyles.textTheme.labelMedium?.copyWith(
+      color: ColorTokens.textSecondary,
+    ),
   );
 
   static final FilledButtonThemeData filledButton = FilledButtonThemeData(

@@ -54,7 +54,17 @@ class DeviceListState {
 
   bool get isEmpty => devices.isEmpty;
   bool get isNotEmpty => devices.isNotEmpty;
-  int get supportedDevices => total - unsupportedCount;
+
+  /// Jumlah perangkat yang didukung.
+  ///
+  /// `total` berasal dari backend dan bisa lebih kecil dari jumlah perangkat
+  /// yang ditandai perlu verifikasi (mis. respons parsial). Nilai tidak boleh
+  /// negatif karena hanya dipakai untuk tampilan ringkasan.
+  int get supportedDevices {
+    final int supported = total - unsupportedCount;
+    return supported < 0 ? 0 : supported;
+  }
+
   int get unsupportedCount {
     return devices.where((d) => d.isVerificationRequired).length;
   }

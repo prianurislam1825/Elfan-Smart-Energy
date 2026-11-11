@@ -7,6 +7,7 @@ import '../../features/dashboard/screens/home_screen.dart';
 import '../../features/devices/screens/device_detail_screen.dart';
 import '../../features/devices/screens/devices_screen.dart';
 import '../../features/energy/screens/energy_screen.dart';
+import '../../features/settings/screens/settings_screen.dart';
 import '../../features/voice/screens/voice_screen.dart';
 import '../../shared/widgets/app_shell.dart';
 import 'app_routes.dart';
@@ -70,6 +71,13 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
           _branch(AppRoutes.cctv, AppRouteNames.cctv, const CctvScreen()),
           _branch(AppRoutes.energy, AppRouteNames.energy, const EnergyScreen()),
         ],
+      ),
+      // Halaman pendukung di luar bottom navigation (docs/01 §6).
+      GoRoute(
+        path: AppRoutes.settings,
+        name: AppRouteNames.settings,
+        builder: (BuildContext context, GoRouterState state) =>
+            const SettingsScreen(),
       ),
     ],
     errorBuilder: (BuildContext context, GoRouterState state) {

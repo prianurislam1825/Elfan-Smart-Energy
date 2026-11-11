@@ -7,6 +7,16 @@ abstract final class AppConstants {
   static const String description =
       'Pantau perangkat, CCTV, dan energi dalam satu aplikasi.';
 
-  /// Label kecil yang dipakai pada placeholder Phase 1.
-  static const String foundationPhaseLabel = 'Phase 1 · Foundation';
+  /// Label platform yang ditampilkan pada kartu sambutan Home.
+  static const String platformLabel = 'Mobile V2';
+
+  /// Versi yang ditampilkan pada halaman Pengaturan.
+  ///
+  /// Samakan dengan `version` di `pubspec.yaml` saat merilis build baru.
+  /// Versi yang ditampilkan di aplikasi.
+  ///
+  /// Sumber kebenaran tetap `version:` pada `pubspec.yaml`; nilai ini harus
+  /// sama dan dijaga oleh `test/core/app_version_test.dart`. Duplikasi tidak
+  /// dapat dihilangkan tanpa menambah dependency pembaca metadata build.
+  static const String appVersion = '1.0.0';
 }

@@ -47,9 +47,6 @@ class AppShell extends StatelessWidget {
                     child: NavigationRail(
                       selectedIndex: navigationShell.currentIndex,
                       onDestinationSelected: _onDestinationSelected,
-                      backgroundColor: ColorTokens.surface,
-                      indicatorColor: ColorTokens.primarySoft,
-                      labelType: NavigationRailLabelType.all,
                       minWidth: 84,
                       leading: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),

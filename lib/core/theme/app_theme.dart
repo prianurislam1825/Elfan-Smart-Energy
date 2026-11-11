@@ -50,6 +50,7 @@ abstract final class AppTheme {
       appBarTheme: ComponentTheme.appBar,
       cardTheme: ComponentTheme.card,
       navigationBarTheme: ComponentTheme.navigationBar,
+      navigationRailTheme: ComponentTheme.navigationRail,
       filledButtonTheme: ComponentTheme.filledButton,
       outlinedButtonTheme: ComponentTheme.outlinedButton,
       textButtonTheme: ComponentTheme.textButton,

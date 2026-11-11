@@ -12,6 +12,9 @@ abstract final class AppRoutes {
   static const String cctv = '/cctv';
   static const String energy = '/energy';
 
+  /// Halaman pendukung (bukan salah satu dari lima menu utama).
+  static const String settings = '/settings';
+
   /// Path detail perangkat relatif terhadap [devices].
   static const String deviceDetailSegment = ':deviceId';
 
@@ -26,5 +29,6 @@ abstract final class AppRouteNames {
   static const String voice = 'voice';
   static const String cctv = 'cctv';
   static const String energy = 'energy';
+  static const String settings = 'settings';
   static const String deviceDetail = 'deviceDetail';
 }

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show immutable;
 import 'device_providers.dart';
 import '../models/device_model.dart';
 import '../models/monitoring_model.dart';
+import '../services/api_exception.dart';
 
 /// Parameter kontrol perangkat.
 class DeviceCommand {
@@ -67,7 +68,9 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
       await turnAllOn(device);
       return;
     }
-    await _sendCommand(device.id, _singleChannelCommand(device, true));
+    await _sendCommand(device.id, <String, dynamic>{
+      _singleChannelDp(device): true,
+    });
   }
 
   /// Kirim perintah OFF ke perangkat.
@@ -76,7 +79,9 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
       await turnAllOff(device);
       return;
     }
-    await _sendCommand(device.id, _singleChannelCommand(device, false));
+    await _sendCommand(device.id, <String, dynamic>{
+      _singleChannelDp(device): false,
+    });
   }
 
   /// Kirim perintah ke channel spesifik (multi-channel).
@@ -85,60 +90,69 @@ class DeviceControlNotifier extends Notifier<DeviceControlState> {
     int channelIndex,
     bool value,
   ) async {
-    final channel = device.channels?.elementAtOrNull(channelIndex);
-    if (channel == null) {
-      state = state.copyWith(error: 'Kanal tidak ditemukan');
-      return;
+    _assertControllable(device);
+    final List<DeviceChannel> channels = device.channels!;
+    if (channelIndex < 0 || channelIndex >= channels.length) {
+      throw const ApiException(
+        kind: ApiExceptionKind.unsupported,
+        message: 'Kanal perangkat tidak ditemukan pada data backend.',
+      );
     }
     await _sendCommand(device.id, <String, dynamic>{
-      channel.switchDp: value,
+      channels[channelIndex].switchDp: value,
     }, channelIndex: channelIndex);
   }
 
   /// Kirim semua ON untuk multi-channel.
-  Future<void> turnAllOn(Device device) async {
-    if (!device.isMultiChannel) {
-      await _sendCommand(device.id, _singleChannelCommand(device, true));
-      return;
-    }
-
-    final commands = <String, dynamic>{};
-    for (final channel in device.channels!) {
-      commands[channel.switchDp] = true;
-    }
-    await _sendCommand(device.id, commands);
-  }
+  Future<void> turnAllOn(Device device) => _sendAll(device, true);
 
   /// Kirim semua OFF untuk multi-channel.
-  Future<void> turnAllOff(Device device) async {
-    if (!device.isMultiChannel) {
-      await _sendCommand(device.id, _singleChannelCommand(device, false));
-      return;
-    }
+  Future<void> turnAllOff(Device device) => _sendAll(device, false);
 
+  Future<void> _sendAll(Device device, bool value) async {
+    _assertControllable(device);
+    final List<DeviceChannel> channels = device.channels!;
     final commands = <String, dynamic>{};
-    for (final channel in device.channels!) {
-      commands[channel.switchDp] = false;
+    for (final channel in channels) {
+      commands[channel.switchDp] = value;
     }
     await _sendCommand(device.id, commands);
   }
 
-  /// Kirim perintah custom.
-  Future<void> sendCustomCommand(
-    String logicalId,
-    Map<String, dynamic> command, {
-    int? channelIndex,
-  }) async {
-    await _sendCommand(logicalId, command, channelIndex: channelIndex);
+  /// `switch_dp` untuk perangkat satu kanal.
+  ///
+  /// Tidak ada nilai cadangan seperti `switch_1`: DP yang tidak dikirim backend
+  /// tidak boleh ditebak karena dapat mengirim perintah ke kanal yang salah.
+  String _singleChannelDp(Device device) {
+    _assertControllable(device);
+    return device.channels!.first.switchDp;
   }
 
-  /// Gunakan `switch_dp` dari channel jika backend menyediakannya.
-  Map<String, dynamic> _singleChannelCommand(Device device, bool value) {
-    final List<DeviceChannel>? channels = device.channels;
-    final String dp = channels != null && channels.isNotEmpty
-        ? channels.first.switchDp
-        : 'switch_1';
-    return <String, dynamic>{dp: value};
+  /// Tolak kontrol yang belum aman sebelum menyentuh jaringan.
+  ///
+  /// Perangkat `verification_required`, nonaktif, atau tanpa `switch_dp` tidak
+  /// boleh dikirim perintah (AI_RULES §6, §11).
+  void _assertControllable(Device device) {
+    if (device.isVerificationRequired) {
+      throw const ApiException(
+        kind: ApiExceptionKind.unsupported,
+        message: 'Perangkat ini memerlukan verifikasi sebelum dikontrol.',
+      );
+    }
+    if (!device.enabled) {
+      throw const ApiException(
+        kind: ApiExceptionKind.unsupported,
+        message:
+            'Perangkat dinonaktifkan di backend sehingga tidak dapat '
+            'dikontrol.',
+      );
+    }
+    if (!device.hasChannels) {
+      throw const ApiException(
+        kind: ApiExceptionKind.unsupported,
+        message: 'Backend tidak mengirim DP kontrol untuk perangkat ini.',
+      );
+    }
   }
 
   /// Kirim perintah ke perangkat.

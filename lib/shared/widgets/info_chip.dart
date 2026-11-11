@@ -27,7 +27,7 @@ class InfoChip extends StatelessWidget {
       ChipTone.success => (ColorTokens.success, ColorTokens.successSoft),
       ChipTone.warning => (ColorTokens.warning, ColorTokens.warningSoft),
       ChipTone.danger => (ColorTokens.danger, ColorTokens.dangerSoft),
-      ChipTone.info => (ColorTokens.textSecondary, ColorTokens.background),
+      ChipTone.info => (ColorTokens.info, ColorTokens.infoSoft),
     };
 
     return Container(
