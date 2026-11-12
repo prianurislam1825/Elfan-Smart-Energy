@@ -3,6 +3,9 @@
          dibutuhkan di semua build type; tanpa ini release build tidak dapat
          mengakses jaringan sama sekali. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Diperlukan libwebrtc (flutter_webrtc) untuk memantau jaringan saat
+         negosiasi ICE; tanpa permission ini native peer connection crash. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:label="elfan_mobile"
         android:name="${applicationName}"
